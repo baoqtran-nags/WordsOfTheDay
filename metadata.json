@@ -1,0 +1,6 @@
+{
+  "name": "Words of the Day",
+  "description": "Advanced C1/C2 & IELTS 6.5-8.0 / VSTEP C1 professional industry English vocabulary and idioms builder.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
