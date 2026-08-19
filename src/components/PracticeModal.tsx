@@ -7,9 +7,10 @@ interface PracticeModalProps {
   isOpen: boolean;
   onClose: () => void;
   words: WordItem[];
+  onQuizComplete?: (score: number, total: number) => void;
 }
 
-export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, words }) => {
+export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, words, onQuizComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -59,7 +60,11 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
     setIsAnswered(false);
     setSelectedOption(null);
     setIsFlipped(false);
-    setCurrentIndex((prev) => prev + 1);
+    const nextIdx = currentIndex + 1;
+    if (nextIdx >= questions.length && onQuizComplete) {
+      onQuizComplete(score, questions.length);
+    }
+    setCurrentIndex(nextIdx);
   };
 
   const handleRestart = () => {

@@ -1,9 +1,14 @@
-import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3 } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
-import { QuoteItem } from '../types';
+import { QuoteItem, StreakData, AchievementBadge, LearnedWordMeta } from '../types';
 import { playPronunciation } from '../utils/speech';
+import { getLast7DaysStatus, getLocalDateString } from '../utils/streak';
 import { FontSizeMode } from './Header';
+import { triggerStreakCelebrationConfetti } from '../utils/confetti';
+import { AchievementsSection } from './AchievementsSection';
+import { WeeklyActivityChart } from './WeeklyActivityChart';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface SidebarProps {
   onRefresh: () => void;
@@ -12,6 +17,8 @@ interface SidebarProps {
   onSelectIndustry: (industry: string) => void;
   onOpenGlossary: () => void;
   onOpenPractice: () => void;
+  onOpenReview: () => void;
+  wordsDueForReviewCount: number;
   savedCount: number;
   onToggleShowSavedOnly: () => void;
   showSavedOnly: boolean;
@@ -24,6 +31,10 @@ interface SidebarProps {
   totalCurrentWordsCount: number;
   onMarkAllLearned: () => void;
   onResetLearnedCurrentSet: () => void;
+  streakData: StreakData;
+  justCompletedSet?: boolean;
+  badges: AchievementBadge[];
+  learnedMeta: Record<string, LearnedWordMeta>;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -33,6 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectIndustry,
   onOpenGlossary,
   onOpenPractice,
+  onOpenReview,
+  wordsDueForReviewCount,
   savedCount,
   onToggleShowSavedOnly,
   showSavedOnly,
@@ -44,7 +57,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   learnedCountInCurrentSet,
   totalCurrentWordsCount,
   onMarkAllLearned,
-  onResetLearnedCurrentSet
+  onResetLearnedCurrentSet,
+  streakData,
+  justCompletedSet = false,
+  badges,
+  learnedMeta,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -52,7 +69,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
     year: 'numeric',
   });
 
-  const [isPlayingQuote, setIsPlayingQuote] = React.useState(false);
+  const todayStr = getLocalDateString();
+  const isCompletedToday = streakData.lastCompletedDate === todayStr;
+  const last7Days = getLast7DaysStatus(streakData.completedDates);
+
+  const [isPlayingQuote, setIsPlayingQuote] = useState(false);
+  const [hasTriggeredConfetti, setHasTriggeredConfetti] = useState(false);
+
+  const progressPercent = totalCurrentWordsCount > 0
+    ? Math.round((learnedCountInCurrentSet / totalCurrentWordsCount) * 100)
+    : 0;
+
+  const isAllLearned = totalCurrentWordsCount > 0 && learnedCountInCurrentSet === totalCurrentWordsCount;
+
+  // Trigger celebratory confetti and pulse when user reaches 100% completion of the day
+  useEffect(() => {
+    if (isAllLearned && (!hasTriggeredConfetti || justCompletedSet)) {
+      triggerStreakCelebrationConfetti();
+      setHasTriggeredConfetti(true);
+    } else if (!isAllLearned) {
+      setHasTriggeredConfetti(false);
+    }
+  }, [isAllLearned, justCompletedSet, hasTriggeredConfetti]);
 
   const handlePlayQuote = () => {
     if (isPlayingQuote) return;
@@ -63,12 +101,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       () => setIsPlayingQuote(false)
     );
   };
-
-  const progressPercent = totalCurrentWordsCount > 0
-    ? Math.round((learnedCountInCurrentSet / totalCurrentWordsCount) * 100)
-    : 0;
-
-  const isAllLearned = totalCurrentWordsCount > 0 && learnedCountInCurrentSet === totalCurrentWordsCount;
 
   return (
     <aside className="w-full lg:w-96 xl:w-[420px] shrink-0 flex flex-col gap-5">
@@ -101,7 +133,107 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span>Today is {todayFormatted}</span>
         </div>
 
-        {/* Daily Learning Progress Box (Xác nhận đã học) */}
+        {/* Daily Streak Card with celebratory pulse animation */}
+        <motion.div
+          animate={
+            isAllLearned
+              ? {
+                  scale: [1, 1.03, 1],
+                  boxShadow: [
+                    '0px 4px 6px -1px rgba(245, 158, 11, 0.1)',
+                    '0px 12px 24px -2px rgba(245, 158, 11, 0.45)',
+                    '0px 4px 6px -1px rgba(245, 158, 11, 0.1)',
+                  ],
+                }
+              : {}
+          }
+          transition={{ duration: 1.2, repeat: isAllLearned ? 2 : 0, ease: 'easeInOut' }}
+          className="bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white rounded-2xl p-4.5 mb-4 shadow-md relative overflow-hidden"
+        >
+          {/* Celebratory golden glow */}
+          <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/20 rounded-full blur-xl pointer-events-none" />
+
+          {/* Sparkles indicator if completed today */}
+          {isCompletedToday && (
+            <div className="absolute top-2 right-2 flex items-center gap-1 text-amber-200 text-xs font-black animate-pulse">
+              <Sparkles className="w-4 h-4" />
+            </div>
+          )}
+
+          <div className="flex items-start justify-between gap-3 mb-3 relative z-10">
+            <div className="flex items-center gap-2.5">
+              <motion.div
+                animate={
+                  streakData.currentStreak > 0
+                    ? {
+                        scale: [1, 1.15, 1],
+                        rotate: [0, -3, 3, 0],
+                      }
+                    : {}
+                }
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center shadow-inner text-amber-200 border border-white/30"
+              >
+                <Flame className={`w-7 h-7 ${streakData.currentStreak > 0 ? 'text-amber-200 fill-amber-300' : 'text-white'}`} />
+              </motion.div>
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-amber-100 block">
+                  Chuỗi học liên tiếp (Daily Streak)
+                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    {streakData.currentStreak}
+                  </span>
+                  <span className="text-sm font-bold text-amber-100">
+                    {streakData.currentStreak === 1 ? 'Ngày liên tục' : 'Ngày liên tục'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Longest streak badge */}
+            <div className="bg-black/25 backdrop-blur-xs border border-white/20 rounded-xl px-2.5 py-1 text-right shrink-0">
+              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-200 uppercase">
+                <Trophy className="w-3 h-3 text-amber-300" />
+                <span>Kỷ lục</span>
+              </div>
+              <span className="text-sm font-black text-white">{streakData.longestStreak} ngày</span>
+            </div>
+          </div>
+
+          {/* 7-day visual week calendar dots */}
+          <div className="bg-black/20 rounded-xl p-2.5 border border-white/15 relative z-10">
+            <div className="flex items-center justify-between gap-1">
+              {last7Days.map((d, i) => (
+                <div key={i} className="flex flex-col items-center gap-1 flex-1">
+                  <span className="text-[10px] font-bold text-amber-100/90">{d.dayLabel}</span>
+                  <div
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black transition-all ${
+                      d.isCompleted
+                        ? 'bg-white text-orange-600 shadow-xs ring-2 ring-white/60 scale-105'
+                        : d.isToday
+                        ? 'bg-amber-400/40 text-white border-2 border-dashed border-white'
+                        : 'bg-black/25 text-white/50'
+                    }`}
+                    title={`${d.dateString}: ${d.isCompleted ? 'Hoàn thành' : 'Chưa hoàn thành'}`}
+                  >
+                    {d.isCompleted ? <Check className="w-4 h-4 stroke-[3]" /> : d.isToday ? '•' : ''}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-2 text-center text-[11px] font-bold text-amber-100">
+              {isCompletedToday ? (
+                <span className="text-emerald-100">🎉 Đã duy trì chuỗi ngày hôm nay!</span>
+              ) : (
+                <span>Học xong 10 từ hôm nay để tăng chuỗi 🔥</span>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Daily Learning Progress Box */}
         <div className={`p-4 rounded-xl border-2 mb-4 transition-all ${
           isAllLearned
             ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-xs'
@@ -110,7 +242,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-1.5 font-extrabold text-sm sm:text-base">
               {isAllLearned ? (
-                <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+                <Award className="w-5 h-5 text-emerald-600 shrink-0 animate-bounce" />
               ) : (
                 <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0" />
               )}
@@ -133,7 +265,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {isAllLearned ? (
             <div className="text-xs sm:text-sm font-bold text-emerald-800 bg-white p-2.5 rounded-lg border border-emerald-200 text-center">
-              🎉 Xuất sắc! Bạn đã hoàn thành 10/10 từ hôm nay!
+              🎉 Xuất sắc! Bạn đã hoàn thành 10/10 từ và tăng chuỗi học!
             </div>
           ) : (
             <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
@@ -168,6 +300,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <RefreshCw className={`w-5 h-5 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
           <span>Tạo 10 Từ Mới Hôm Nay</span>
+        </button>
+
+        {/* Dedicated "Review Mode" Button (Spaced Repetition 3+ Days) */}
+        <button
+          id="sidebar-review-btn"
+          onClick={onOpenReview}
+          className="w-full mb-3 p-3 rounded-xl border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-950 font-extrabold text-sm flex items-center justify-between shadow-xs transition-all cursor-pointer group"
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+              <Brain className="w-4 h-4" />
+            </div>
+            <div className="text-left">
+              <span className="block leading-tight">Review Mode (Ôn tập C1/C2)</span>
+              <span className="text-[11px] text-indigo-700 font-semibold">Ghi nhớ dài hạn (3+ ngày trước)</span>
+            </div>
+          </div>
+
+          <span className="px-2 py-0.5 rounded-full text-xs font-black bg-indigo-600 text-white shadow-2xs">
+            {wordsDueForReviewCount} từ
+          </span>
         </button>
 
         {/* Quick Action Grid */}
@@ -214,6 +367,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Weekly Activity Chart (Recharts) */}
+      <WeeklyActivityChart
+        learnedMeta={learnedMeta}
+        learnedCountToday={learnedCountInCurrentSet}
+      />
+
+      {/* Digital Achievements & Milestone Badges */}
+      <AchievementsSection badges={badges} />
 
       {/* Quote of the Day in Left Column */}
       <div className="bg-slate-950 text-white rounded-2xl border-2 border-slate-800 overflow-hidden shadow-md relative group p-5">

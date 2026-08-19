@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, CheckCircle2 } from 'lucide-react';
+import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, CheckCircle2, Sparkles, RefreshCw, GraduationCap, Building2, MessageSquare, BookOpen } from 'lucide-react';
 import { playPronunciation } from '../utils/speech';
+import { getThreeContextAwareExamples, fetchAlternativeAcademicScenarios, ContextScenario } from '../utils/academicExamples';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface WordCardProps {
@@ -23,31 +24,94 @@ export const WordCard: React.FC<WordCardProps> = ({
   onToggleLearned,
   onShowToast
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayingWord, setIsPlayingWord] = useState(false);
+  const [playingSentenceIndex, setPlayingSentenceIndex] = useState<number | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isEtymologyOpen, setIsEtymologyOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const handleListen = () => {
-    if (isPlaying) return;
-    setIsPlaying(true);
+  // Dynamic context-aware academic scenarios
+  const [isAlternativeMode, setIsAlternativeMode] = useState(false);
+  const [isFetchingAlt, setIsFetchingAlt] = useState(false);
+
+  const standardScenarios = getThreeContextAwareExamples(item);
+  const alternativeScenarios = fetchAlternativeAcademicScenarios(item);
+  const currentScenarios: ContextScenario[] = isAlternativeMode ? alternativeScenarios : standardScenarios;
+
+  // Pronounce word using Web Speech API
+  const handleListenWord = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (isPlayingWord) return;
+
+    setIsPlayingWord(true);
     const success = playPronunciation(
       item.word,
-      () => setIsPlaying(false),
-      () => {
-        setIsPlaying(false);
-        onShowToast('Audio pronunciation unavailable in current browser', 'info');
+      {
+        rate: 0.85,
+        pitch: 1.0,
+        accent: 'US',
+        onStart: () => setIsPlayingWord(true),
+        onEnd: () => setIsPlayingWord(false),
+        onError: () => {
+          setIsPlayingWord(false);
+          onShowToast('Web Speech API: Trình duyệt chưa hỗ trợ giọng đọc này', 'info');
+        }
       }
     );
-    if (!success) setIsPlaying(false);
+
+    if (!success) {
+      setIsPlayingWord(false);
+      onShowToast('Web Speech API is not supported in this browser environment', 'info');
+    }
+  };
+
+  // Pronounce individual context sentence
+  const handleListenSentence = (sentence: string, sentenceIdx: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (playingSentenceIndex === sentenceIdx) return;
+
+    setPlayingSentenceIndex(sentenceIdx);
+    const success = playPronunciation(
+      sentence,
+      {
+        rate: 0.90, // Natural cadence for academic speech
+        pitch: 1.0,
+        accent: 'US',
+        onStart: () => setPlayingSentenceIndex(sentenceIdx),
+        onEnd: () => setPlayingSentenceIndex(null),
+        onError: () => {
+          setPlayingSentenceIndex(null);
+          onShowToast('Không thể phát âm câu này', 'info');
+        }
+      }
+    );
+
+    if (!success) setPlayingSentenceIndex(null);
+  };
+
+  const handleToggleAltExamples = () => {
+    setIsFetchingAlt(true);
+    setTimeout(() => {
+      setIsAlternativeMode((prev) => !prev);
+      setIsFetchingAlt(false);
+      onShowToast(
+        !isAlternativeMode ? 'Đã tải 3 ví dụ học thuật chuyên sâu mới (Band 8.5+)' : 'Đã quay lại 3 ví dụ chuẩn',
+        'info'
+      );
+    }, 200);
   };
 
   const handleCopy = () => {
     const etymText = item.etymology ? `\nEtymology: ${item.etymology}` : '';
-    const formatted = `${item.word} (${item.ipa})\nType: ${item.type} | Industry: ${item.industry} | Level: ${item.level}\nDefinition: ${item.definition}${etymText}\nExamples:\n1. ${item.examples[0]}\n2. ${item.examples[1]}`;
+    const examplesText = currentScenarios
+      .map((s, i) => `${i + 1}. [${s.badge}] ${s.sentence}`)
+      .join('\n');
+
+    const formatted = `${item.word} (${item.ipa})\nType: ${item.type} | Industry: ${item.industry} | Level: ${item.level}\nDefinition: ${item.definition}${etymText}\n\nAcademic Context Examples (IELTS C1/C2 Standards):\n${examplesText}`;
+    
     navigator.clipboard.writeText(formatted);
     setIsCopied(true);
-    onShowToast(`Copied "${item.word}" to clipboard!`, 'success');
+    onShowToast(`Đã sao chép từ và 3 ví dụ chuẩn IELTS của "${item.word}"!`, 'success');
     setTimeout(() => setIsCopied(false), 2000);
   };
 
@@ -190,26 +254,42 @@ export const WordCard: React.FC<WordCardProps> = ({
             </div>
           )}
 
-          {/* Word Heading + Audio */}
+          {/* Word Heading + Speaker Pronunciation Button */}
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif]">
+            <h3 
+              onClick={() => handleListenWord()}
+              className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif] hover:text-indigo-600 transition-colors cursor-pointer"
+              title="Click để nghe phát âm từ vựng (Web Speech API)"
+            >
               {item.word}
             </h3>
+
+            {/* Main Speaker Pronunciation Button */}
             <button
               id={`btn-listen-${item.id}`}
-              onClick={handleListen}
-              disabled={isPlaying}
-              className="p-2.5 text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors border border-indigo-200 cursor-pointer shrink-0"
-              title="Listen to pronunciation"
+              onClick={handleListenWord}
+              disabled={isPlayingWord}
+              aria-label={`Listen to pronunciation of ${item.word}`}
+              className={`p-2.5 rounded-xl transition-all border cursor-pointer shrink-0 flex items-center justify-center ${
+                isPlayingWord
+                  ? 'bg-indigo-600 text-white border-indigo-700 shadow-md ring-2 ring-indigo-300 scale-105'
+                  : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border-indigo-200 hover:shadow-xs'
+              }`}
+              title="Nghe phát âm chuẩn (Web Speech API)"
             >
-              <Volume2 className={`w-5 h-5 ${isPlaying ? 'animate-bounce text-indigo-800' : ''}`} />
+              <Volume2 className={`w-5 h-5 ${isPlayingWord ? 'animate-pulse' : ''}`} />
             </button>
           </div>
 
-          {/* Phonetics & Class */}
-          <p className="text-sm sm:text-base font-mono text-slate-600 font-bold mt-1">
-            {item.ipa}
-          </p>
+          {/* Phonetics IPA with Click-to-Listen */}
+          <div 
+            onClick={() => handleListenWord()}
+            className="flex items-center gap-1.5 text-sm sm:text-base font-mono text-slate-600 font-bold mt-1 cursor-pointer hover:text-indigo-600 transition-colors group"
+            title="Click to listen to IPA pronunciation"
+          >
+            <span>{item.ipa}</span>
+            <span className="text-[10px] text-slate-400 group-hover:text-indigo-500 font-sans font-semibold">🔊 US</span>
+          </div>
 
           <div className="flex items-center gap-2 mt-2.5 flex-wrap">
             <span className={`text-xs font-black uppercase px-2.5 py-1 rounded-md border ${theme.badgeBg}`}>
@@ -260,20 +340,20 @@ export const WordCard: React.FC<WordCardProps> = ({
               id={`btn-copy-${item.id}`}
               onClick={handleCopy}
               className="py-2 px-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer"
-              title="Copy Word Details"
+              title="Copy Word Details & 3 IELTS Examples"
             >
-              {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+              {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-500" />}
               <span>{isCopied ? 'Đã sao chép' : 'Sao chép'}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Right Column: Definition, Roots, Examples & Collocations */}
+      {/* Right Column: Definition, Roots, 3 Context-Aware Academic Examples & Collocations */}
       <div className="flex-1 flex flex-col justify-between border-t-2 md:border-t-0 md:border-l-2 border-slate-200/70 pt-4 md:pt-0 md:pl-6">
         <div>
-          {/* Definition with Elder-friendly Large Typography */}
-          <div className="mb-4">
+          {/* Definition */}
+          <div className="mb-3.5">
             <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-1">
               Definition & Strategic Meaning
             </span>
@@ -284,7 +364,7 @@ export const WordCard: React.FC<WordCardProps> = ({
 
           {/* Etymology Section */}
           {item.etymology && (
-            <div className="mb-4">
+            <div className="mb-3.5">
               <button
                 id={`btn-etymology-${item.id}`}
                 onClick={() => setIsEtymologyOpen(!isEtymologyOpen)}
@@ -322,17 +402,78 @@ export const WordCard: React.FC<WordCardProps> = ({
             </div>
           )}
 
-          {/* Workplace Examples */}
-          <div className="space-y-2.5 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-wider block">
-              Professional Context & Examples:
-            </span>
-            <p className="text-sm sm:text-base text-slate-800 leading-relaxed italic">
-              1. “{renderHighlightedSentence(item.examples[0], item.word)}”
-            </p>
-            <p className="text-sm sm:text-base text-slate-800 leading-relaxed italic">
-              2. “{renderHighlightedSentence(item.examples[1], item.word)}”
-            </p>
+          {/* 3 Context-Aware Academic Examples (IELTS C1/C2 Academic Standards) */}
+          <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200 space-y-3">
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-indigo-600" />
+                <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                  3 Context-Aware Academic Examples (IELTS Band 8.0–9.0):
+                </span>
+              </div>
+
+              {/* Dynamic Context Fetcher Button */}
+              <button
+                onClick={handleToggleAltExamples}
+                disabled={isFetchingAlt}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                title="Tạo các ngữ cảnh học thuật thay thế khác"
+              >
+                <RefreshCw className={`w-3 h-3 ${isFetchingAlt ? 'animate-spin' : ''}`} />
+                <span>{isAlternativeMode ? 'Xem ví dụ chuẩn' : 'Ngữ cảnh mở rộng'}</span>
+              </button>
+            </div>
+
+            {/* Render 3 Distinct Context Scenarios */}
+            <div className="space-y-3">
+              {currentScenarios.map((scenario, sIdx) => {
+                const isThisPlaying = playingSentenceIndex === sIdx;
+                return (
+                  <div
+                    key={sIdx}
+                    className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-1.5 transition-all hover:border-slate-300"
+                  >
+                    {/* Context Header with Category Badge & Speaker */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${scenario.badgeColor}`}>
+                          {scenario.badge}
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500">
+                          {scenario.category}
+                        </span>
+                      </div>
+
+                      {/* Speaker Pronunciation for this exact sentence */}
+                      <button
+                        onClick={(e) => handleListenSentence(scenario.sentence, sIdx, e)}
+                        disabled={isThisPlaying}
+                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer shrink-0 ${
+                          isThisPlaying
+                            ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs ring-1 ring-indigo-300 scale-105'
+                            : 'bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-700 border-slate-200'
+                        }`}
+                        title={`Nghe phát âm câu ${sIdx + 1} (Web Speech API)`}
+                      >
+                        <Volume2 className={`w-3.5 h-3.5 ${isThisPlaying ? 'animate-bounce text-white' : ''}`} />
+                      </button>
+                    </div>
+
+                    {/* Sentence text with highlighted target vocabulary */}
+                    <p className="text-sm sm:text-base text-slate-900 leading-relaxed font-medium">
+                      “{renderHighlightedSentence(scenario.sentence, item.word)}”
+                    </p>
+
+                    {/* Syntactic & Academic Commentary */}
+                    {scenario.syntacticNote && (
+                      <p className="text-[11px] text-slate-500 italic pt-0.5 border-t border-slate-100">
+                        💡 <span className="font-semibold text-slate-600">Band 8.5+ Feature:</span> {scenario.syntacticNote}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 

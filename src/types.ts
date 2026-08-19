@@ -8,6 +8,12 @@ export type IndustryType =
   | 'Leadership & Negotiation'
   | 'Sustainability & ESG';
 
+export interface AcademicExample {
+  context: string; // e.g. "IELTS Writing Task 2 (Argumentative)", "Executive & Corporate Strategy", "IELTS Academic Analysis"
+  sentence: string;
+  analysis?: string; // Brief note on collocations or syntactic structure
+}
+
 export interface WordItem {
   id: string;
   word: string;
@@ -18,7 +24,8 @@ export interface WordItem {
   definition: string;
   collocations?: string[];
   synonyms?: string[];
-  examples: [string, string];
+  examples: string[]; // 3 context-aware C1/C2 sentences
+  academicExamples?: AcademicExample[];
   etymology?: string; // Latin / Greek root breakdown
   imageUrl: string; // Visual illustration depicting the concept
   imageCaption?: string; // Caption explaining the visual metaphor
@@ -42,4 +49,32 @@ export interface QuizQuestion {
   correctAnswer: string;
   options: string[];
   explanation: string;
+}
+
+export interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  lastCompletedDate: string; // "YYYY-MM-DD"
+  completedDates: string[]; // array of "YYYY-MM-DD" strings
+}
+
+export interface LearnedWordMeta {
+  wordId: string;
+  learnedAt: string; // "YYYY-MM-DD"
+  daysAgo?: number;
+  lastReviewedAt?: string;
+  reviewCount?: number;
+}
+
+export interface AchievementBadge {
+  id: string;
+  title: string;
+  description: string;
+  iconName: 'Flame' | 'Trophy' | 'Target' | 'Brain' | 'Sparkles' | 'BookOpen' | 'Volume2' | 'Award';
+  category: 'streak' | 'mastery' | 'quiz' | 'review';
+  isUnlocked: boolean;
+  unlockedAt?: string;
+  currentProgress: number;
+  maxProgress: number;
+  accentColor: string; // e.g., 'amber', 'emerald', 'indigo', 'rose', 'purple'
 }
