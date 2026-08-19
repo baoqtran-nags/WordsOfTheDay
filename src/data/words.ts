@@ -180,7 +180,7 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     industry: 'Business & Strategy',
     level: 'C1',
     definition: 'Relating to the interaction or cooperation of two or more entities/subsystems producing a combined effect greater than the sum of their individual components.',
-    etymology: 'Greek συνεργία (synergia "joint work, cooperation"), from syn- ("together, with") + ergon ("work, action", root of energy and ergonomics).',
+    etymology: 'Greek συνεργía (synergia "joint work, cooperation"), from syn- ("together, with") + ergon ("work, action", root of energy and ergonomics).',
     imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop',
     imageCaption: 'Interlocking team intellects compounding collaborative outcomes far beyond individual efforts.',
     collocations: ['synergistic relationship', 'exploit synergistic gains', 'synergistic effect'],
@@ -570,6 +570,481 @@ export const VOCABULARY_DATABASE: WordItem[] = [
       'The executive summary successfully distilled forty pages of econometric modeling into three salient strategic takeaways.'
     ],
     ieltsBandContext: 'Exceptional academic descriptor for summarizing key findings, highlighting trends, or explaining mental models.'
+  },
+  {
+    id: 'w31',
+    word: 'Pivotal',
+    ipa: '/ˈpɪv.ə.təl/',
+    type: 'Adjective',
+    industry: 'Business & Strategy',
+    level: 'C1',
+    definition: 'Of crucial importance in relation to the development or success of something else; acting as the central point on which a whole system turns.',
+    etymology: 'French pivot ("hinge pin, axis of rotation"), referring to the physical mechanical axle on which an entire mechanism balances or rotates.',
+    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A central fulcrum architectural apex supporting critical weight-bearing structures.',
+    collocations: ['play a pivotal role', 'pivotal moment in history', 'pivotal turning point'],
+    synonyms: ['crucial', 'decisive', 'foundational'],
+    examples: [
+      'Securing the Series B investment was a pivotal milestone that allowed the biotech enterprise to initiate multinational clinical trials.',
+      'Customer lifetime value plays a pivotal role in determining whether unit economics remain sustainable during aggressive expansion.'
+    ],
+    ieltsBandContext: 'High-utility C1 academic descriptor for IELTS Writing Task 2 and Speaking Part 3 when identifying critical factors.'
+  },
+  {
+    id: 'w32',
+    word: 'Ephemeral',
+    ipa: '/ɪˈfem.ər.əl/',
+    type: 'Adjective',
+    industry: 'Tech & Data Science',
+    level: 'C2',
+    definition: 'Lasting for a very short, fleeting period of time; in computing, non-persistent storage or stateless execution lifecycles.',
+    etymology: 'Greek ἐφήμερος (ephemeros "lasting only a day"), from epi ("on, upon") + hemera ("day"). Related to ephemera.',
+    imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Fleeting morning mist evaporating across mountain ridges within minutes.',
+    collocations: ['ephemeral storage', 'ephemeral nature of digital trends', 'ephemeral containers'],
+    synonyms: ['transient', 'fleeting', 'evanescent', 'short-lived'],
+    examples: [
+      'Serverless function instances utilize ephemeral compute environments that spin down immediately following request termination.',
+      'Viral social media attention is notoriously ephemeral, requiring brands to convert fleeting traffic into durable email subscribers rapidly.'
+    ],
+    ieltsBandContext: 'Poetic and precise C2 descriptor used to contrast transient modern phenomena with enduring institutional values.'
+  },
+  {
+    id: 'w33',
+    word: 'Circumspect',
+    ipa: '/ˈsɜː.kəm.spekt/',
+    type: 'Adjective',
+    industry: 'Leadership & Negotiation',
+    level: 'C2',
+    definition: 'Wary and unwilling to take uncalculated risks; prudently analyzing all surrounding consequences before acting.',
+    etymology: 'Latin circumspectus ("cautious, looking about"), from circum ("around") + specere ("to look, observe", root of inspect, aspect, and spectacle).',
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A strategic diplomat carefully surveying every perimeter angle before signing a treaty.',
+    collocations: ['circumspect approach', 'remain highly circumspect', 'circumspect in public statements'],
+    synonyms: ['judicious', 'prudent', 'chary', 'guarded'],
+    examples: [
+      'The general counsel remained extremely circumspect during the regulatory deposition, phrasing every answer with meticulous precision.',
+      'Venture capitalists have adopted a much more circumspect investment stance amid rising interest rates and macroeconomic volatility.'
+    ],
+    ieltsBandContext: 'Elite character trait adjective demonstrating superior academic vocabulary control in management and behavioral essays.'
+  },
+  {
+    id: 'w34',
+    word: 'Ancillary',
+    ipa: '/ænˈsɪl.ər.i/',
+    type: 'Adjective / Noun',
+    industry: 'FinTech & Banking',
+    level: 'C1',
+    definition: 'Providing necessary support to the primary activities or operation of an organization, institution, or industry.',
+    etymology: 'Latin ancillaris ("relating to maidservants or auxiliary attendants"), from ancilla ("female servant, handmaiden").',
+    imageUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Auxiliary support cables anchoring and stabilizing a primary suspension bridge.',
+    collocations: ['ancillary revenue streams', 'ancillary services', 'ancillary benefits'],
+    synonyms: ['supplementary', 'auxiliary', 'subordinate', 'supportive'],
+    examples: [
+      'Commercial airlines generate billions in high-margin profit through ancillary fees for baggage handling, seat selection, and lounge access.',
+      'The fintech app integrated ancillary payroll and tax filing modules to deepen customer stickiness within its core banking platform.'
+    ],
+    ieltsBandContext: 'Essential corporate finance and economics terminology to explain secondary revenue diversification.'
+  },
+  {
+    id: 'w35',
+    word: 'Disparate',
+    ipa: '/ˈdɪs.pər.ət/',
+    type: 'Adjective',
+    industry: 'Tech & Data Science',
+    level: 'C1',
+    definition: 'Essentially different in kind; not allowing comparison; containing fundamentally heterogeneous elements.',
+    etymology: 'Latin disparatus ("separated, divided"), from dis- ("apart") + parare ("to prepare, make ready"). Related to disparity.',
+    imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Diverse heterogeneous digital network protocols converging into a unified database.',
+    collocations: ['disparate data sources', 'disparate elements', 'unify disparate systems'],
+    synonyms: ['heterogeneous', 'divergent', 'dissimilar', 'incongruous'],
+    examples: [
+      'The enterprise data warehouse harmonizes telemetry from dozens of disparate CRM, ERP, and legacy database systems.',
+      'The interdisciplinary research symposium brought together disparate viewpoints across cognitive neuroscience and artificial intelligence.'
+    ],
+    ieltsBandContext: 'Superior academic replacement for "different" or "unrelated", frequently utilized in academic research synthesis.'
+  },
+  {
+    id: 'w36',
+    word: 'Juxtaposition',
+    ipa: '/ˌdʒʌk.stə.pəˈzɪʃ.ən/',
+    type: 'Noun',
+    industry: 'Marketing & Growth',
+    level: 'C1',
+    definition: 'The fact of two things being seen or placed close together with contrasting effect.',
+    etymology: 'Latin juxta ("near, beside") + French position (from Latin ponere "to place"). Formed in 17th-century French philosophy.',
+    imageUrl: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A stark aesthetic contrast between ancient classical stone architecture and ultra-modern glass facades.',
+    collocations: ['stark juxtaposition', 'the juxtaposition of past and present', 'striking juxtaposition'],
+    synonyms: ['contrast', 'comparison', 'counterposition'],
+    examples: [
+      'The advertising campaign leveraged the stark juxtaposition of futuristic robotics and pastoral farming to convey sustainable tech.',
+      'The report’s juxtaposition of executive bonuses alongside employee layoffs triggered public indignation and shareholder backlash.'
+    ],
+    ieltsBandContext: 'Advanced critical analysis noun for IELTS Writing Task 2 and literature/arts commentary.'
+  },
+  {
+    id: 'w37',
+    word: 'Pragmatic',
+    ipa: '/præɡˈmæt.ɪk/',
+    type: 'Adjective',
+    industry: 'Leadership & Negotiation',
+    level: 'C1',
+    definition: 'Dealing with things sensibly and realistically in a way that is based on practical rather than theoretical considerations.',
+    etymology: 'Greek πραγματικός (pragmatikos "fit for business or action"), from pragma ("deed, matter, affair", from prassein "to do").',
+    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A hands-on engineering blueprint focusing on tangible, actionable solutions.',
+    collocations: ['pragmatic approach', 'pragmatic solution', 'adopt a pragmatic stance'],
+    synonyms: ['utilitarian', 'hardheaded', 'practical', 'businesslike'],
+    examples: [
+      'Rather than pursuing ideological purism, the committee agreed on a pragmatic compromise that balanced budget constraints with public safety.',
+      'A pragmatic engineering leader prioritizes shipping functional software incrementally over debating theoretical perfection endlessly.'
+    ],
+    ieltsBandContext: 'Prime descriptor for leadership, governance, policy-making, and organizational conflict resolution.'
+  },
+  {
+    id: 'w38',
+    word: 'Bespoke',
+    ipa: '/bɪˈspəʊk/',
+    type: 'Adjective',
+    industry: 'Business & Strategy',
+    level: 'C1',
+    definition: 'Custom-made, tailored, or individually designed to the exact specifications and unique requirements of a particular customer or problem.',
+    etymology: 'Old English besprecan ("to speak about, arrange beforehand"), evolving in London’s Savile Row tailoring trade to mean a suit "spoken for" by a customer before construction.',
+    imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Master artisan tailoring custom garments to exact client measurements.',
+    collocations: ['bespoke software solution', 'bespoke advisory services', 'craft a bespoke strategy'],
+    synonyms: ['custom-tailored', 'made-to-order', 'individualized', 'personalized'],
+    examples: [
+      'Tier-1 investment banks provide bespoke risk-hedging derivatives to sovereign wealth funds navigating currency devaluations.',
+      'The consultancy engineered a bespoke machine learning pipeline specifically calibrated to the retailer’s supply chain topology.'
+    ],
+    ieltsBandContext: 'Sophisticated commercial descriptor replacing "custom" or "special" in professional business communication.'
+  },
+  {
+    id: 'w39',
+    word: 'Omnichannel',
+    ipa: '/ˈɒm.niˌtʃæn.əl/',
+    type: 'Adjective',
+    industry: 'Marketing & Growth',
+    level: 'C1',
+    definition: 'Providing a seamless, unified, and integrated consumer experience across all physical stores, mobile apps, digital storefronts, and support channels.',
+    etymology: 'Latin omnis ("all, whole") + channel (from Latin canalis "water pipe, groove"). Coined in modern retail supply chain theory.',
+    imageUrl: 'https://images.unsplash.com/photo-1556742049-0a67c5574f73?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Seamless retail integration across in-store kiosks, mobile commerce, and automated fulfillment.',
+    collocations: ['omnichannel marketing strategy', 'seamless omnichannel experience', 'omnichannel retail ecosystem'],
+    synonyms: ['cross-channel integration', 'unified commerce', 'multimodal retailing'],
+    examples: [
+      'Retailers with true omnichannel capabilities allow consumers to order online, pickup in-store, and process returns via self-service lockers.',
+      'Implementing unified customer ID graphing was crucial to measuring cross-device conversions across our omnichannel growth campaigns.'
+    ],
+    ieltsBandContext: 'Standard modern digital economy and e-commerce term for marketing, consumer behavior, and tech essays.'
+  },
+  {
+    id: 'w40',
+    word: 'Onerous',
+    ipa: '/ˈɒn.ər.əs/',
+    type: 'Adjective',
+    industry: 'Corporate Law & Governance',
+    level: 'C2',
+    definition: 'Involving an oppressive, burdensome amount of effort, difficulty, or statutory liability that outweighs the accompanying benefits.',
+    etymology: 'Latin onerosus ("burdensome, heavy"), from onus ("load, burden, weight of responsibility", root of exonerate and onus).',
+    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'An overwhelming tower of legal regulatory compliance dossiers and statutory paperwork.',
+    collocations: ['onerous compliance requirements', 'onerous contract terms', 'onerous tax burden'],
+    synonyms: ['burdensome', 'oppressive', 'arduous', 'exacting'],
+    examples: [
+      'Early-stage startups often struggle to satisfy the onerous reporting covenants imposed by traditional banking institutions.',
+      'The European Union simplified sustainability disclosures to prevent smaller enterprises from facing overly onerous administrative hurdles.'
+    ],
+    ieltsBandContext: 'Academic C2 adjective to characterize excessive taxation, red tape, legal covenants, and demanding obligations.'
+  },
+  {
+    id: 'w41',
+    word: 'Resilience',
+    ipa: '/rɪˈzɪl.i.əns/',
+    type: 'Noun',
+    industry: 'Sustainability & ESG',
+    level: 'C1',
+    definition: 'The capacity of an ecosystem, supply chain, or organization to absorb systemic shocks, adapt to disruption, and recover rapid operational equilibrium.',
+    etymology: 'Latin resilientia from resilire ("to spring back, rebound"), from re- ("back") + salire ("to jump, leap").',
+    imageUrl: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A solitary pine tree thriving amidst rugged, windswept alpine cliffs.',
+    collocations: ['climate resilience', 'operational resilience', 'supply chain resilience'],
+    synonyms: ['robustness', 'elasticity', 'tenacity', 'adaptability'],
+    examples: [
+      'Investing in decentralized microgrids enhances grid resilience against extreme weather events induced by climate change.',
+      'The pandemic highlighted that global manufacturing prioritized lean efficiency at the expense of structural supply chain resilience.'
+    ],
+    ieltsBandContext: 'Universally tested IELTS topic word for essays on environmental sustainability, mental health, and economic stability.'
+  },
+  {
+    id: 'w42',
+    word: 'Benchmark',
+    ipa: '/ˈbentʃ.mɑːk/',
+    type: 'Noun / Verb',
+    industry: 'Business & Strategy',
+    level: 'C1',
+    definition: 'A standard, point of reference, or performance criterion against which other things may be compared, measured, or evaluated.',
+    etymology: '19th-century land surveying term: a chiseled horizontal mark in stone to support a surveyor’s angle iron ("bench") as a reference height.',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'High-precision calibration instruments establishing reliable reference baselines.',
+    collocations: ['establish an industry benchmark', 'benchmark against competitors', 'gold standard benchmark'],
+    synonyms: ['yardstick', 'gauge', 'standard of comparison', 'touchstone'],
+    examples: [
+      'The 10-year Treasury yield serves as the global benchmark for pricing corporate bonds and long-term commercial loans.',
+      'Our software engineering department benchmarks its continuous integration build speeds against top Silicon Valley peers.'
+    ],
+    ieltsBandContext: 'High-utility analytical term for comparative IELTS Writing Task 1 charts and Task 2 evaluative essays.'
+  },
+  {
+    id: 'w43',
+    word: 'Sycophant',
+    ipa: '/ˈsɪk.ə.fænt/',
+    type: 'Noun',
+    industry: 'Leadership & Negotiation',
+    level: 'C2',
+    definition: 'A person who acts obsequiously toward someone important in order to gain advantage or favor; a self-serving flatterer.',
+    etymology: 'Greek συκοφάντης (sykophantes), literally "one who shows the fig" (from sykon "fig" + phainein "to show"). In Athens, an informer who exposed illicit exporters of sacred figs.',
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A courtly sycophantic advisor bowing to power rather than speaking candid truth.',
+    collocations: ['surrounded by sycophants', 'sycophantic behavior', 'sycophantic praise'],
+    synonyms: ['toady', 'flatterer', 'yes-man', 'fawner'],
+    examples: [
+      'Effective CEOs actively seek dissenting viewpoints to ensure they do not become insulated inside an echo chamber of sycophants.',
+      'The downfall of autocratic corporate governance often begins when executives punish candid feedback and promote sycophants.'
+    ],
+    ieltsBandContext: 'Literary and psychological C2 noun used to critique flawed workplace culture and leadership dynamics.'
+  },
+  {
+    id: 'w44',
+    word: 'Scalability',
+    ipa: '/ˌskeɪ.ləˈbɪl.ə.ti/',
+    type: 'Noun',
+    industry: 'Tech & Data Science',
+    level: 'C1',
+    definition: 'The capability of a system, network, or business process to handle a growing amount of work gracefully or its potential to be enlarged easily.',
+    etymology: 'Latin scala ("ladder, staircase", from scandere "to climb", root of ascend and scale). In systems theory, refers to proportional expansion.',
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A modular data center cluster dynamically provisioning server racks under load.',
+    collocations: ['horizontal scalability', 'cloud scalability', 'ensure system scalability'],
+    synonyms: ['expandability', 'adaptability', 'extensibility', 'growth capacity'],
+    examples: [
+      'Microservices architecture was selected specifically for its horizontal scalability during seasonal black-Friday traffic spikes.',
+      'Venture capitalists evaluate early-stage software companies primarily on the scalability of their automated customer acquisition model.'
+    ],
+    ieltsBandContext: 'Fundamental term in technology, startup economics, infrastructure planning, and software engineering.'
+  },
+  {
+    id: 'w45',
+    word: 'Caveat emptor',
+    ipa: '/ˌkæv.i.æt ˈemp.tɔːr/',
+    type: 'Idiom / Noun phrase',
+    industry: 'Corporate Law & Governance',
+    level: 'C2',
+    definition: 'The commercial principle that the buyer alone is responsible for checking the quality, title, and suitability of goods before a purchase is made.',
+    etymology: 'Latin legal maxim meaning "let the buyer beware" (caveat "let him beware", from cavere + emptor "buyer", from emere "to buy").',
+    imageUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A careful purchaser scrutinizing fine-print contractual clauses before purchase.',
+    collocations: ['principle of caveat emptor', 'strictly caveat emptor', 'govern under caveat emptor'],
+    synonyms: ['buyer beware', 'purchaser risk rule', 'unwarranted transaction'],
+    examples: [
+      'In unregulated secondary art auctions, caveat emptor applies, meaning the buyer bears full responsibility for authenticating the provenance.',
+      'Consumer protection statutes have largely eroded the historic common law doctrine of caveat emptor in residential real estate.'
+    ],
+    ieltsBandContext: 'Prestigious Latin legal idiom that demonstrates sophisticated legal and commercial literacy in academic writing.'
+  },
+  {
+    id: 'w46',
+    word: 'Precipitous',
+    ipa: '/prɪˈsɪp.ɪ.təs/',
+    type: 'Adjective',
+    industry: 'FinTech & Banking',
+    level: 'C2',
+    definition: 'Dangerously high, steep, or abrupt; done suddenly and without careful consideration.',
+    etymology: 'Latin praecipitium ("a steep place, cliff"), from praeceps ("headfirst, headlong", from prae- "before" + caput "head").',
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A sheer vertical mountain precipice dropping thousands of feet into a canyon.',
+    collocations: ['precipitous decline', 'precipitous drop in stock prices', 'precipitous action'],
+    synonyms: ['steep', 'abrupt', 'headlong', 'perilous'],
+    examples: [
+      'The tech sector witnessed a precipitous drop in valuations following the central bank’s surprise interest rate hike.',
+      'Analysts cautioned that a precipitous withdrawal from foreign energy imports could plunge the economy into a deep winter recession.'
+    ],
+    ieltsBandContext: 'Elite descriptive adjective for IELTS Task 1 trend descriptions (replacing "sharp" or "dramatic") and Task 2 risk essays.'
+  },
+  {
+    id: 'w47',
+    word: 'Bottleneck',
+    ipa: '/ˈbɒt.əl.nek/',
+    type: 'Noun / Verb',
+    industry: 'Business & Strategy',
+    level: 'C1',
+    definition: 'A point of congestion or obstruction that impedes progress or slows down the capacity of an entire production chain or system.',
+    etymology: 'Physical metaphor referring to the narrow neck of a glass bottle which constrains the maximum flow rate of liquid being poured.',
+    imageUrl: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A narrow arterial transit chokepoint creating upstream vehicular queues.',
+    collocations: ['operational bottleneck', 'eliminate bottlenecks', 'chokepoint bottleneck'],
+    synonyms: ['constriction', 'chokepoint', 'impasse', 'impediment'],
+    examples: [
+      'Manual quality assurance inspections became the primary bottleneck preventing the engineering team from deploying daily updates.',
+      'Port congestion on the Pacific coast created unprecedented supply chain bottlenecks for automotive semiconductor components.'
+    ],
+    ieltsBandContext: 'High-frequency operational term in business process optimization, industrial engineering, and workflow analysis.'
+  },
+  {
+    id: 'w48',
+    word: 'Equivocate',
+    ipa: '/ɪˈkwɪv.ə.keɪt/',
+    type: 'Verb',
+    industry: 'Leadership & Negotiation',
+    level: 'C2',
+    definition: 'To use ambiguous or evasive language intentionally in order to conceal the truth or avoid committing oneself to a position.',
+    etymology: 'Late Latin aequivocare ("to call by the same name"), from aequus ("equal") + vox / vocare ("voice, to call"). Root of equivalent and vocal.',
+    imageUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A crossroads with divergent signs shrouded in ambiguous fog.',
+    collocations: ['refuse to equivocate', 'equivocate on key policies', 'politicians equivocating'],
+    synonyms: ['prevaricate', 'hedge', 'vacillate', 'evade'],
+    examples: [
+      'When asked directly about impending redundancies, the spokesperson equivocated rather than giving employees a straightforward confirmation.',
+      'In high-stakes diplomatic summits, leaders who equivocate on binding treaty terms risk undermining bilateral trust.'
+    ],
+    ieltsBandContext: 'Nuanced C2 verb for analyzing deceptive political rhetoric, diplomatic ambiguity, and ethics.'
+  },
+  {
+    id: 'w49',
+    word: 'Siloed',
+    ipa: '/ˈsaɪ.ləʊd/',
+    type: 'Adjective',
+    industry: 'Business & Strategy',
+    level: 'C1',
+    definition: 'Isolated from others in a way that hinders communication, cross-functional collaboration, and the sharing of institutional information.',
+    etymology: 'Spanish silo (from Greek siros "a pit for holding grain"), applied metaphorically in 1980s organizational behavior to isolated corporate departments.',
+    imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Separate industrial agricultural silos standing strictly isolated without connecting corridors.',
+    collocations: ['siloed thinking', 'break down siloed departments', 'siloed data repositories'],
+    synonyms: ['compartmentalized', 'isolated', 'fragmented', 'insular'],
+    examples: [
+      'The company restructured into cross-functional agile squads to dismantle legacy siloed departments and accelerate product iteration.',
+      'Siloed customer data prevented marketing and sales from maintaining a synchronized understanding of the enterprise sales pipeline.'
+    ],
+    ieltsBandContext: 'Standard corporate governance and organizational design term for management case studies and IELTS Task 2 essays.'
+  },
+  {
+    id: 'w50',
+    word: 'Stringent',
+    ipa: '/ˈstrɪn.dʒənt/',
+    type: 'Adjective',
+    industry: 'Medicine & BioTech',
+    level: 'C1',
+    definition: 'Strict, precise, and rigorously binding; demanding rigorous adherence to standards, regulations, or safety protocols.',
+    etymology: 'Latin stringens ("drawing tight, compressing"), present participle of stringere ("to bind tight", root of strict, strain, and restrict).',
+    imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'High-security cleanroom biotechnology lab adhering to sterile safety benchmarks.',
+    collocations: ['stringent regulatory standards', 'stringent safety protocols', 'stringent clinical guidelines'],
+    synonyms: ['rigorous', 'austere', 'inflexible', 'uncompromising'],
+    examples: [
+      'The FDA enforces stringent regulatory benchmarks before granting market authorization for novel gene-editing therapies.',
+      'Aviation authorities imposed stringent maintenance audits on regional passenger fleets following anomalous engine telemetry.'
+    ],
+    ieltsBandContext: 'High-scoring academic descriptor for government regulations, academic standards, and public health policies.'
+  },
+  {
+    id: 'w51',
+    word: 'Hedging',
+    ipa: '/ˈhedʒ.ɪŋ/',
+    type: 'Noun / Verb',
+    industry: 'FinTech & Banking',
+    level: 'C1',
+    definition: 'An investment strategy designed to limit or offset potential losses in one asset by taking an opposite position in a related derivative or security.',
+    etymology: 'Old English hecg ("border of shrubs or trees planted as a boundary or barrier"), evolving in 17th-century finance to mean planting a protective fence around investments.',
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A protective boundary wall sheltering valuable assets against stormy market waves.',
+    collocations: ['hedging against inflation', 'currency hedging strategy', 'hedging exposure'],
+    synonyms: ['risk offsetting', 'defensive positioning', 'countervailing protection'],
+    examples: [
+      'Multinational exporters utilize forward currency contracts as a hedging mechanism against sudden fluctuations in the euro.',
+      'Commodity producers employ futures hedging to lock in profitable selling prices months before harvesting agricultural yields.'
+    ],
+    ieltsBandContext: 'Essential financial risk management terminology for macroeconomic discussions and business feasibility.'
+  },
+  {
+    id: 'w52',
+    word: 'Incongruous',
+    ipa: '/ɪnˈkɒŋ.ɡru.əs/',
+    type: 'Adjective',
+    industry: 'Leadership & Negotiation',
+    level: 'C2',
+    definition: 'Not in harmony or keeping with the surroundings or other aspects of something; visibly out of place or contradictory.',
+    etymology: 'Latin incongruus ("unsuitable, inconsistent"), from in- ("not") + congruere ("to agree, come together", root of congruent).',
+    imageUrl: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A neon-lit futuristic sculpture standing amidst an ancient centuries-old monastery courtyard.',
+    collocations: ['incongruous element', 'appear incongruous', 'strikingly incongruous'],
+    synonyms: ['discordant', 'incompatible', 'anomalous', 'ill-matched'],
+    examples: [
+      'The CEO’s extravagant private jet purchase seemed strikingly incongruous immediately after announcing company-wide budget freezes.',
+      'There was something decidedly incongruous about discussing cutting-edge artificial intelligence in a 14th-century cathedral hall.'
+    ],
+    ieltsBandContext: 'Elite descriptive adjective for highlighting ethical contradictions, social anomalies, and aesthetic friction.'
+  },
+  {
+    id: 'w53',
+    word: 'Telemetry',
+    ipa: '/təˈlem.ə.tri/',
+    type: 'Noun',
+    industry: 'Tech & Data Science',
+    level: 'C1',
+    definition: 'The in-situ automatic collection, measurement, and wireless transmission of data from remote or inaccessible sources to receiving systems for monitoring.',
+    etymology: 'Greek tele- ("far off, distant") + metron ("measure, rule"). Originally developed in aerospace and meteorology.',
+    imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Real-time telemetry stream dials mapping aerospace vehicle diagnostic readings.',
+    collocations: ['real-time telemetry', 'device telemetry data', 'telemetry logging'],
+    synonyms: ['remote sensing', 'automated diagnostics', 'data transmission stream'],
+    examples: [
+      'Satellite telemetry streams continuous orbital trajectory and thermal readings back to mission control operations.',
+      'Autonomous fleet algorithms process onboard sensor telemetry at milliseconds intervals to execute safe emergency braking maneuvers.'
+    ],
+    ieltsBandContext: 'Modern specialized engineering and computer science noun for Internet of Things (IoT) and data analysis.'
+  },
+  {
+    id: 'w54',
+    word: 'Cognitive dissonance',
+    ipa: '/ˌkɒɡ.nə.tɪv ˈdɪs.ə.nəns/',
+    type: 'Noun phrase',
+    industry: 'Marketing & Growth',
+    level: 'C1',
+    definition: 'The state of having inconsistent thoughts, beliefs, or attitudes, especially as relating to behavioral decisions and post-purchase customer regret.',
+    etymology: 'Latin cognoscere ("to know") + dissonantia ("discord, disagreement of sound", from dis- "apart" + sonare "to sound"). Coined by social psychologist Leon Festinger in 1957.',
+    imageUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A fractured mirror reflecting contradictory internal perceptions and opposing beliefs.',
+    collocations: ['experience cognitive dissonance', 'alleviate cognitive dissonance', 'post-purchase cognitive dissonance'],
+    synonyms: ['psychological discord', 'mental conflict', 'belief inconsistency'],
+    examples: [
+      'Automakers send detailed congratulatory welcome packets to luxury car buyers specifically to mitigate post-purchase cognitive dissonance.',
+      'Employees experienced severe cognitive dissonance when corporate leaders preached environmental ethics while expanding fossil fuel investments.'
+    ],
+    ieltsBandContext: 'Crucial psychological and marketing concept for academic essays on consumer psychology, ethics, and human behavior.'
+  },
+  {
+    id: 'w55',
+    word: 'Emanate',
+    ipa: '/ˈem.ə.neɪt/',
+    type: 'Verb',
+    industry: 'Business & Strategy',
+    level: 'C2',
+    definition: 'To issue, originate, or spread out from a specific source, center, or authority; to give out or emit.',
+    etymology: 'Latin emanatus, past participle of emanare ("to flow out, spring out"), from e- ("out of") + manare ("to flow, trickle").',
+    imageUrl: 'https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Luminous light rays emanating outward from a central radiant beacon.',
+    collocations: ['emanate from leadership', 'authority emanates from the constitution', 'signals emanate from the central bank'],
+    synonyms: ['originate', 'radiate', 'stem', 'derive'],
+    examples: [
+      'Strategic vision and organizational values must emanate from executive leadership rather than being outsourced to external advisors.',
+      'The authoritative legal mandate of the regulatory agency emanates directly from statutory powers passed by parliament.'
+    ],
+    ieltsBandContext: 'High-register formal academic verb used to trace origin of laws, influence, institutional power, and scientific phenomena.'
   }
 ];
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 import { QuoteItem } from '../types';
 import { playPronunciation } from '../utils/speech';
@@ -20,6 +20,10 @@ interface SidebarProps {
   onToggleFontSize: () => void;
   quote: QuoteItem;
   onRefreshQuote: () => void;
+  learnedCountInCurrentSet: number;
+  totalCurrentWordsCount: number;
+  onMarkAllLearned: () => void;
+  onResetLearnedCurrentSet: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -36,7 +40,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   fontSizeMode,
   onToggleFontSize,
   quote,
-  onRefreshQuote
+  onRefreshQuote,
+  learnedCountInCurrentSet,
+  totalCurrentWordsCount,
+  onMarkAllLearned,
+  onResetLearnedCurrentSet
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -55,6 +63,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       () => setIsPlayingQuote(false)
     );
   };
+
+  const progressPercent = totalCurrentWordsCount > 0
+    ? Math.round((learnedCountInCurrentSet / totalCurrentWordsCount) * 100)
+    : 0;
+
+  const isAllLearned = totalCurrentWordsCount > 0 && learnedCountInCurrentSet === totalCurrentWordsCount;
 
   return (
     <aside className="w-full lg:w-96 xl:w-[420px] shrink-0 flex flex-col gap-5">
@@ -76,7 +90,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Sparkles className="w-3 h-3 mr-1 text-indigo-700" />
                 C1 / Advanced
               </span>
-              <span className="text-xs text-slate-500 font-semibold">IELTS 6.5–8.5</span>
+              <span className="text-xs text-slate-500 font-semibold">10 Từ mỗi ngày • IELTS 7.0–8.5</span>
             </div>
           </div>
         </div>
@@ -87,7 +101,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span>Today is {todayFormatted}</span>
         </div>
 
-        {/* Primary Generator Button */}
+        {/* Daily Learning Progress Box (Xác nhận đã học) */}
+        <div className={`p-4 rounded-xl border-2 mb-4 transition-all ${
+          isAllLearned
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-xs'
+            : 'bg-slate-50 border-slate-200 text-slate-900'
+        }`}>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 font-extrabold text-sm sm:text-base">
+              {isAllLearned ? (
+                <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+              ) : (
+                <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0" />
+              )}
+              <span>Tiến độ học hôm nay:</span>
+            </div>
+            <span className="text-sm font-black px-2 py-0.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+              {learnedCountInCurrentSet}/{totalCurrentWordsCount} từ
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full bg-slate-200/80 h-3 rounded-full overflow-hidden mb-2.5">
+            <div
+              className={`h-full transition-all duration-500 rounded-full ${
+                isAllLearned ? 'bg-emerald-600' : 'bg-indigo-600'
+              }`}
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+
+          {isAllLearned ? (
+            <div className="text-xs sm:text-sm font-bold text-emerald-800 bg-white p-2.5 rounded-lg border border-emerald-200 text-center">
+              🎉 Xuất sắc! Bạn đã hoàn thành 10/10 từ hôm nay!
+            </div>
+          ) : (
+            <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>Đạt {progressPercent}% mục tiêu ngày</span>
+              <button
+                onClick={onMarkAllLearned}
+                className="text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer"
+              >
+                Học xong cả {totalCurrentWordsCount} từ
+              </button>
+            </div>
+          )}
+
+          {learnedCountInCurrentSet > 0 && (
+            <div className="mt-2 text-right">
+              <button
+                onClick={onResetLearnedCurrentSet}
+                className="text-[11px] text-slate-400 hover:text-rose-600 font-medium inline-flex items-center gap-1 cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" /> Đặt lại tiến độ
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Primary Generator Button (10 words) */}
         <button
           id="sidebar-refresh-btn"
           onClick={onRefresh}
@@ -95,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-indigo-600 rounded-xl bg-indigo-600 text-base font-bold text-white hover:bg-indigo-700 transition-all shadow-md active:scale-98 disabled:opacity-60 cursor-pointer mb-3"
         >
           <RefreshCw className={`w-5 h-5 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>Generate New 5 Words</span>
+          <span>Tạo 10 Từ Mới Hôm Nay</span>
         </button>
 
         {/* Quick Action Grid */}
@@ -115,7 +187,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-800 border-2 border-slate-200 transition-colors shadow-2xs cursor-pointer"
           >
             <BookOpen className="w-4 h-4 text-indigo-600" />
-            <span>All Words</span>
+            <span>All Words (55)</span>
           </button>
 
           <button

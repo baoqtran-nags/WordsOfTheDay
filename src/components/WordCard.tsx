@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, Sparkles } from 'lucide-react';
+import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, CheckCircle2 } from 'lucide-react';
 import { playPronunciation } from '../utils/speech';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -8,7 +8,9 @@ interface WordCardProps {
   item: WordItem;
   index: number;
   isSaved: boolean;
+  isLearned: boolean;
   onToggleSave: (id: string) => void;
+  onToggleLearned: (id: string) => void;
   onShowToast: (text: string, type: 'success' | 'info' | 'error') => void;
 }
 
@@ -16,7 +18,9 @@ export const WordCard: React.FC<WordCardProps> = ({
   item,
   index,
   isSaved,
+  isLearned,
   onToggleSave,
+  onToggleLearned,
   onShowToast
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -148,11 +152,23 @@ export const WordCard: React.FC<WordCardProps> = ({
       exit={{ opacity: 0, y: -10 }}
       transition={{
         duration: 0.35,
-        delay: index * 0.05,
+        delay: index * 0.03,
         ease: 'easeOut',
       }}
-      className={`snap-start scroll-mt-6 bg-white rounded-2xl border-2 border-slate-200 shadow-md border-t-8 ${theme.borderTop} p-5 sm:p-7 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all w-full`}
+      className={`snap-start scroll-mt-6 rounded-2xl border-2 shadow-md border-t-8 ${theme.borderTop} p-5 sm:p-7 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all w-full relative ${
+        isLearned
+          ? 'bg-emerald-50/40 border-emerald-300'
+          : 'bg-white border-slate-200'
+      }`}
     >
+      {/* Learned Badge Indicator */}
+      {isLearned && (
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-black shadow-sm">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          <span>ĐÃ HỌC • LEARNED</span>
+        </div>
+      )}
+
       {/* Left Column: Visual Illustration & Core Identity */}
       <div className="w-full md:w-5/12 lg:w-4/12 shrink-0 flex flex-col justify-between">
         <div>
@@ -208,35 +224,53 @@ export const WordCard: React.FC<WordCardProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100">
+        {/* Action Buttons: Mark as Learned + Save + Copy */}
+        <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-slate-200/80">
+          
+          {/* Primary "Đã học / Mark as Learned" Button */}
           <button
-            id={`btn-save-${item.id}`}
-            onClick={() => onToggleSave(item.id)}
-            className={`flex-1 py-2 px-3 rounded-xl border-2 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
-              isSaved
-                ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-2xs'
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+            id={`btn-learned-${item.id}`}
+            onClick={() => onToggleLearned(item.id)}
+            className={`w-full py-2.5 px-3 rounded-xl border-2 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+              isLearned
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700'
+                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300'
             }`}
+            title={isLearned ? 'Bỏ đánh dấu đã học' : 'Xác nhận đã thuộc từ này'}
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-amber-600 text-amber-600' : ''}`} />
-            <span>{isSaved ? 'Saved' : 'Save'}</span>
+            <CheckCircle2 className={`w-4 h-4 ${isLearned ? 'text-white' : 'text-emerald-700'}`} />
+            <span>{isLearned ? '✓ Đã thuộc từ này' : 'Xác nhận đã học'}</span>
           </button>
 
-          <button
-            id={`btn-copy-${item.id}`}
-            onClick={handleCopy}
-            className="py-2 px-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer"
-            title="Copy Word Details"
-          >
-            {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-            <span>{isCopied ? 'Copied' : 'Copy'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              id={`btn-save-${item.id}`}
+              onClick={() => onToggleSave(item.id)}
+              className={`flex-1 py-2 px-3 rounded-xl border-2 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                isSaved
+                  ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-2xs'
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-amber-600 text-amber-600' : ''}`} />
+              <span>{isSaved ? 'Đã lưu' : 'Lưu'}</span>
+            </button>
+
+            <button
+              id={`btn-copy-${item.id}`}
+              onClick={handleCopy}
+              className="py-2 px-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer"
+              title="Copy Word Details"
+            >
+              {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+              <span>{isCopied ? 'Đã sao chép' : 'Sao chép'}</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Right Column: Definition, Roots, Examples & Collocations */}
-      <div className="flex-1 flex flex-col justify-between border-t-2 md:border-t-0 md:border-l-2 border-slate-100 pt-4 md:pt-0 md:pl-6">
+      <div className="flex-1 flex flex-col justify-between border-t-2 md:border-t-0 md:border-l-2 border-slate-200/70 pt-4 md:pt-0 md:pl-6">
         <div>
           {/* Definition with Elder-friendly Large Typography */}
           <div className="mb-4">
@@ -304,7 +338,7 @@ export const WordCard: React.FC<WordCardProps> = ({
 
         {/* Collocations */}
         {item.collocations && item.collocations.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs sm:text-sm text-slate-600 flex-wrap">
+          <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center gap-2 text-xs sm:text-sm text-slate-600 flex-wrap">
             <Tag className="w-4 h-4 text-indigo-600 shrink-0" />
             <span className="font-bold text-slate-800">Collocations:</span>
             {item.collocations.map((col, idx) => (
