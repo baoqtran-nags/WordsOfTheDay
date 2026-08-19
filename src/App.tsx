@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { WordItem, QuoteItem } from './types';
 import { VOCABULARY_DATABASE } from './data/words';
 import { QUOTE_DATABASE } from './data/quotes';
-import { Header } from './components/Header';
+import { Header, FontSizeMode } from './components/Header';
 import { QuoteBanner } from './components/QuoteBanner';
 import { WordCard } from './components/WordCard';
 import { PracticeModal } from './components/PracticeModal';
@@ -18,6 +18,15 @@ export default function App() {
   const [showSavedOnly, setShowSavedOnly] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [generationKey, setGenerationKey] = useState<number>(0);
+  const [fontSizeMode, setFontSizeMode] = useState<FontSizeMode>(() => {
+    try {
+      const saved = localStorage.getItem('wotd_font_size');
+      return (saved as FontSizeMode) || 'large'; // Default to large for elder comfort
+    } catch {
+      return 'large';
+    }
+  });
+
   const [savedWordIds, setSavedWordIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('wotd_saved_words');
@@ -37,6 +46,20 @@ export default function App() {
       setToast((curr) => (curr?.text === text ? null : curr));
     }, 3000);
   }, []);
+
+  const handleToggleFontSize = () => {
+    setFontSizeMode((prev) => {
+      const next: FontSizeMode = prev === 'standard' ? 'large' : prev === 'large' ? 'xlarge' : 'standard';
+      try {
+        localStorage.setItem('wotd_font_size', next);
+      } catch (e) {}
+      showToast(
+        `Font size set to: ${next === 'xlarge' ? 'Extra Large' : next === 'large' ? 'Large (Elder-Friendly)' : 'Standard'}`,
+        'info'
+      );
+      return next;
+    });
+  };
 
   // Save bookmarked IDs to localStorage
   useEffect(() => {
@@ -72,7 +95,7 @@ export default function App() {
       setCurrentQuote(randomQuote);
 
       setIsRefreshing(false);
-      showToast('Refreshed with a new set of 5 advanced words & idioms', 'success');
+      showToast('Refreshed with a new set of 5 illustrated words & idioms', 'success');
     }, 250);
   }, [showToast]);
 
@@ -117,6 +140,7 @@ export default function App() {
         (w) =>
           w.word.toLowerCase().includes(q) ||
           w.definition.toLowerCase().includes(q) ||
+          (w.etymology && w.etymology.toLowerCase().includes(q)) ||
           w.industry.toLowerCase().includes(q)
       );
     }
@@ -124,8 +148,15 @@ export default function App() {
     return list;
   }, [currentWords, showSavedOnly, savedWordIds, searchQuery]);
 
+  const fontSizeClass =
+    fontSizeMode === 'xlarge'
+      ? 'text-lg sm:text-xl'
+      : fontSizeMode === 'large'
+      ? 'text-base sm:text-lg'
+      : 'text-sm sm:text-base';
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className={`min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white ${fontSizeClass}`}>
       {/* Toast notifications */}
       <Toast toast={toast} onClose={() => setToast(null)} />
 
@@ -141,47 +172,49 @@ export default function App() {
         onToggleShowSavedOnly={() => setShowSavedOnly((prev) => !prev)}
         showSavedOnly={showSavedOnly}
         activeCount={displayWords.length}
+        fontSizeMode={fontSizeMode}
+        onToggleFontSize={handleToggleFontSize}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        {/* Quote of the Day Banner */}
+        {/* Quote of the Day Banner with Illustrated Visual */}
         <QuoteBanner
           quote={currentQuote}
           onRefreshQuote={() => {
             const currentIdx = QUOTE_DATABASE.findIndex((q) => q.id === currentQuote.id);
             const nextIdx = (currentIdx + 1) % QUOTE_DATABASE.length;
             setCurrentQuote(QUOTE_DATABASE[nextIdx]);
-            showToast('Loaded new thought leader quote', 'info');
+            showToast('Loaded new illustrated thought leader quote', 'info');
           }}
         />
 
         {/* Section Header & Subtitle */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif]">
-                {showSavedOnly ? 'Your Saved Collection' : 'Daily 5 Vocabulary & Idioms'}
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif]">
+                {showSavedOnly ? 'Your Saved Collection' : 'Daily 5 Illustrated Words & Idioms'}
               </h2>
-              <span className="bg-indigo-50 text-indigo-700 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-indigo-200">
+              <span className="bg-indigo-100 text-indigo-900 text-xs sm:text-sm font-black px-3 py-1 rounded-full border border-indigo-200">
                 {displayWords.length} {displayWords.length === 1 ? 'Item' : 'Items'}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              High-utility specialized industry English & executive idioms for CEFR C1-C2 mastery.
+            <p className="text-sm sm:text-base text-slate-600 font-medium mt-1">
+              High-utility specialized industry English, root etymologies & executive idioms for CEFR C1-C2 mastery.
             </p>
           </div>
 
-          {/* Search bar */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          {/* Search bar with large text */}
+          <div className="relative w-full sm:w-72">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search current words..."
+              placeholder="Search current words or roots..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors shadow-xs"
+              className="w-full bg-white border-2 border-slate-300 rounded-xl pl-10 pr-4 py-2 text-sm sm:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-600 transition-colors shadow-xs"
             />
           </div>
         </div>
@@ -191,13 +224,13 @@ export default function App() {
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-slate-200 rounded-xl p-12 text-center my-6 shadow-xs"
+            className="bg-white border-2 border-slate-200 rounded-2xl p-12 text-center my-6 shadow-xs"
           >
-            <Bookmark className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-slate-800 mb-1">
+            <Bookmark className="w-14 h-14 text-slate-300 mx-auto mb-3" />
+            <h3 className="text-xl font-bold text-slate-800 mb-2">
               No saved words in this view
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
+            <p className="text-sm sm:text-base text-slate-600 max-w-md mx-auto mb-6">
               Click the bookmark icon on any card or switch back to the daily focus set to explore new vocabulary.
             </p>
             <button
@@ -205,13 +238,13 @@ export default function App() {
                 setShowSavedOnly(false);
                 setSearchQuery('');
               }}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-xs font-semibold text-white rounded-lg transition-colors shadow-xs"
+              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-sm sm:text-base font-bold text-white rounded-xl transition-colors shadow-md cursor-pointer"
             >
               View Daily Set
             </button>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <AnimatePresence mode="popLayout">
               {displayWords.map((item, index) => (
                 <WordCard
@@ -227,32 +260,32 @@ export default function App() {
           </div>
         )}
 
-        {/* Pedagogical Guideline / Academic Note Section */}
-        <section className="mt-10 mb-6 bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        {/* Pedagogical Framework Section with Enlarged Accessible Type */}
+        <section className="mt-12 mb-8 bg-white border-2 border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700 shrink-0">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-12 h-12 rounded-xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-800 shrink-0">
+              <GraduationCap className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 mb-1 font-['Plus_Jakarta_Sans',sans-serif]">
-                Pedagogical Framework: Advanced Lexical Precision (CEFR C1–C2 / IELTS Band 8.0+)
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 mb-2 font-['Plus_Jakarta_Sans',sans-serif]">
+                Pedagogical Framework: Advanced Lexical Precision & Visual Mnemonics
               </h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
-                At the C1 level, vocabulary learning shifts from memorizing isolated definitions to mastering <strong>collocational agility</strong>, <strong>disciplinary nuance</strong>, and <strong>tone calibration</strong>. Using specialized idioms like <em>"paradigm shift"</em> or precision verbs like <em>"ameliorate"</em> allows you to communicate complex strategic concepts without circumlocution.
+              <p className="text-sm sm:text-base text-slate-700 leading-relaxed mb-5">
+                Visual illustrations and Latin/Greek morphological roots activate dual-coding memory channels. Combining visual concept imagery with precise collocations enables effortless retention of advanced vocabulary (CEFR C1–C2 / IELTS 7.0–8.5).
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <span className="font-semibold text-indigo-800 block mb-0.5">1. Active Collocations</span>
-                  <p className="text-slate-500">Notice which prepositions and partner verbs co-occur naturally with each item.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm sm:text-base">
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <span className="font-bold text-indigo-900 block mb-1 text-base sm:text-lg">1. Visual Metaphors</span>
+                  <p className="text-slate-600">Connect abstract industry terms to clear visual cues for deeper cognitive recall.</p>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <span className="font-semibold text-indigo-800 block mb-0.5">2. Pronunciation & Stress</span>
-                  <p className="text-slate-500">Use the audio playback to internalize accurate primary and secondary syllabic stress.</p>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <span className="font-bold text-indigo-900 block mb-1 text-base sm:text-lg">2. Root Derivations</span>
+                  <p className="text-slate-600">Expand the Etymology drawer on each card to unlock entire morphological word families.</p>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                  <span className="font-semibold text-indigo-800 block mb-0.5">3. Spaced Retention</span>
-                  <p className="text-slate-500">Click "Practice" above to test your recall with the interactive sentence completion quiz.</p>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                  <span className="font-bold text-indigo-900 block mb-1 text-base sm:text-lg">3. Spaced Practice</span>
+                  <p className="text-slate-600">Click "Practice" in the header to reinforce comprehension with active sentence quiz recall.</p>
                 </div>
               </div>
             </div>
@@ -261,11 +294,11 @@ export default function App() {
 
       </main>
 
-      {/* Footer styled according to Professional Polish design theme */}
-      <footer className="border-t border-slate-200 bg-white py-4 text-[11px] text-slate-400 font-medium tracking-tight">
+      {/* Footer */}
+      <footer className="border-t-2 border-slate-200 bg-white py-5 text-xs sm:text-sm text-slate-500 font-semibold tracking-wide">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 uppercase">
-          <span>Advanced ESL Mastery Program • C1/C2 IELTS 6.5–8.0</span>
-          <span>Words of the Day • Professional Industry Edition</span>
+          <span>Advanced ESL Mastery Program • CEFR C1/C2 • IELTS 6.5–8.5</span>
+          <span>Words of the Day • Illustrated Edition</span>
         </div>
       </footer>
 

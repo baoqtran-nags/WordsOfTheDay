@@ -72,27 +72,27 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-      <div className="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative flex flex-col max-h-[90vh] overflow-y-auto">
+      <div className="bg-white border-2 border-slate-200 rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl relative flex flex-col max-h-[90vh] overflow-y-auto">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-4 border-b-2 border-slate-200">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
               Practice & Retention Check
             </h2>
-            <div className="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs">
+            <div className="flex items-center bg-slate-100 rounded-xl p-1 text-xs sm:text-sm border border-slate-200">
               <button
                 onClick={() => setMode('quiz')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
-                  mode === 'quiz' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  mode === 'quiz' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900'
                 }`}
               >
                 Fill-in Quiz
               </button>
               <button
                 onClick={() => setMode('flashcard')}
-                className={`px-2.5 py-1 rounded-md font-semibold transition-all ${
-                  mode === 'flashcard' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  mode === 'flashcard' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-700 hover:text-slate-900'
                 }`}
               >
                 Flashcards
@@ -101,9 +101,9 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200 cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -111,37 +111,37 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
         {!isFinished ? (
           <div className="py-6 flex-1 flex flex-col justify-between">
             {/* Progress Bar */}
-            <div className="flex items-center justify-between text-xs font-medium text-slate-500 mb-2">
+            <div className="flex items-center justify-between text-sm sm:text-base font-bold text-slate-700 mb-2">
               <span>Question {currentIndex + 1} of {questions.length}</span>
-              <span>Score: {score}/{questions.length}</span>
+              <span className="text-indigo-700">Score: {score}/{questions.length}</span>
             </div>
-            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-6">
+            <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden mb-6">
               <div
-                className="bg-indigo-600 h-full transition-all duration-300"
+                className="bg-indigo-600 h-full transition-all duration-300 rounded-full"
                 style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
               />
             </div>
 
             {mode === 'quiz' ? (
-              /* Quiz View */
+              /* Quiz View with Elder-Friendly Sizing */
               <div className="space-y-5">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block mb-1">
-                    Industry Context: {currentQ.item.industry}
+                <div className="bg-slate-50 p-5 rounded-2xl border-2 border-slate-200">
+                  <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-indigo-700 block mb-1.5">
+                    Context: {currentQ.item.industry}
                   </span>
-                  <p className="text-base text-slate-800 leading-relaxed font-medium">
+                  <p className="text-lg sm:text-xl text-slate-900 leading-relaxed font-semibold">
                     “{currentQ.sentenceWithBlank}”
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-2.5">
+                <div className="grid grid-cols-1 gap-3">
                   {currentQ.options.map((option, idx) => {
-                    let btnStyle = 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50 hover:border-indigo-300';
+                    let btnStyle = 'bg-white border-slate-300 text-slate-900 hover:bg-slate-50 hover:border-indigo-400';
                     if (isAnswered) {
                       if (option === currentQ.correctAnswer) {
-                        btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-800 font-semibold';
+                        btnStyle = 'bg-emerald-100 border-emerald-600 text-emerald-950 font-bold';
                       } else if (option === selectedOption) {
-                        btnStyle = 'bg-rose-50 border-rose-500 text-rose-800';
+                        btnStyle = 'bg-rose-100 border-rose-600 text-rose-950 font-bold';
                       } else {
                         btnStyle = 'bg-slate-50 border-slate-200 text-slate-400 opacity-60';
                       }
@@ -152,14 +152,14 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
                         key={idx}
                         onClick={() => handleSelectOption(option)}
                         disabled={isAnswered}
-                        className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-center justify-between text-sm shadow-xs ${btnStyle}`}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between text-base sm:text-lg font-bold shadow-xs cursor-pointer ${btnStyle}`}
                       >
                         <span>{option}</span>
                         {isAnswered && option === currentQ.correctAnswer && (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                         )}
                         {isAnswered && option === selectedOption && option !== currentQ.correctAnswer && (
-                          <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                          <XCircle className="w-5 h-5 text-rose-600 shrink-0" />
                         )}
                       </button>
                     );
@@ -167,42 +167,50 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
                 </div>
 
                 {isAnswered && (
-                  <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs text-slate-700">
-                    <span className="font-bold text-slate-900 block mb-0.5">Definition:</span>
+                  <div className="bg-indigo-50 p-4 rounded-xl border-2 border-indigo-200 text-sm sm:text-base text-slate-800 leading-relaxed">
+                    <span className="font-extrabold text-indigo-950 block mb-1">Definition:</span>
                     {currentQ.explanation}
                   </div>
                 )}
               </div>
             ) : (
-              /* Flashcard View */
+              /* Flashcard View with Elder-Friendly Sizing */
               <div className="flex flex-col items-center justify-center py-4">
                 <div
                   onClick={() => setIsFlipped(!isFlipped)}
-                  className="w-full min-h-[220px] bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-sm hover:shadow-md transition-all"
+                  className="w-full min-h-[260px] bg-slate-50 border-2 border-slate-300 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer shadow-md hover:shadow-lg transition-all"
                 >
                   {!isFlipped ? (
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-indigo-700 tracking-wider block mb-1">
+                      {currentQ.item.imageUrl && (
+                        <img
+                          src={currentQ.item.imageUrl}
+                          alt={currentQ.item.word}
+                          referrerPolicy="no-referrer"
+                          className="w-32 h-24 object-cover rounded-lg border border-slate-300 mx-auto mb-3"
+                        />
+                      )}
+                      <span className="text-xs uppercase font-extrabold text-indigo-800 tracking-wider block mb-1">
                         {currentQ.item.industry} • {currentQ.item.level}
                       </span>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-1">
+                      <h3 className="text-3xl font-extrabold text-slate-900 mb-1">
                         {currentQ.item.word}
                       </h3>
-                      <p className="font-mono text-xs text-slate-500 mb-4">{currentQ.item.ipa}</p>
-                      <span className="text-xs text-indigo-600 font-medium underline decoration-dotted">
-                        Click card to flip and reveal definition
+                      <p className="font-mono text-base font-semibold text-slate-600 mb-4">{currentQ.item.ipa}</p>
+                      <span className="text-sm text-indigo-700 font-bold underline decoration-dotted">
+                        Click card to flip and reveal definition & roots
                       </span>
                     </div>
                   ) : (
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider block mb-1">
+                      <span className="text-xs uppercase font-black text-emerald-800 tracking-wider block mb-1">
                         Definition & Application
                       </span>
-                      <p className="text-sm text-slate-800 mb-4 leading-relaxed font-medium">
+                      <p className="text-base sm:text-lg text-slate-900 mb-4 leading-relaxed font-semibold">
                         {currentQ.item.definition}
                       </p>
-                      <div className="text-xs text-slate-600 italic bg-white p-3 rounded-lg border border-slate-200">
-                        "{currentQ.item.examples[0]}"
+                      <div className="text-sm text-slate-700 italic bg-white p-3.5 rounded-xl border border-slate-200">
+                        “{currentQ.item.examples[0]}”
                       </div>
                     </div>
                   )}
@@ -210,9 +218,9 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
                 <div className="mt-3 flex items-center gap-3">
                   <button
                     onClick={() => playPronunciation(currentQ.item.word)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 rounded-lg border border-slate-300 shadow-xs"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-sm font-bold text-slate-800 rounded-xl border-2 border-slate-300 shadow-xs cursor-pointer"
                   >
-                    <Volume2 className="w-3.5 h-3.5 text-indigo-600" />
+                    <Volume2 className="w-4 h-4 text-indigo-600" />
                     Pronounce
                   </button>
                 </div>
@@ -224,36 +232,36 @@ export const PracticeModal: React.FC<PracticeModalProps> = ({ isOpen, onClose, w
               <button
                 onClick={handleNext}
                 disabled={mode === 'quiz' && !isAnswered}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-semibold text-sm rounded-xl transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-bold text-base rounded-xl transition-all shadow-md cursor-pointer"
               >
-                <span>{currentIndex === questions.length - 1 ? 'Finish' : 'Next Word'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>{currentIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Word'}</span>
+                <ArrowRight className="w-5 h-5" />
               </button>
             </div>
           </div>
         ) : (
           /* Completion Screen */
           <div className="py-8 text-center flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-4 shadow-xs">
-              <Award className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-emerald-700 mb-4 shadow-xs">
+              <Award className="w-9 h-9" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-1">
+            <h3 className="text-2xl font-extrabold text-slate-900 mb-2">
               Practice Session Completed!
             </h3>
-            <p className="text-sm text-slate-600 mb-6">
-              You achieved a retention score of <span className="text-emerald-700 font-bold">{score}/{questions.length}</span> on today's focus set.
+            <p className="text-base sm:text-lg text-slate-700 mb-6">
+              You achieved a retention score of <span className="text-emerald-800 font-extrabold">{score}/{questions.length}</span> on today's focus set.
             </p>
             <div className="flex items-center gap-3">
               <button
                 onClick={handleRestart}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-xl border border-slate-300 transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-800 text-base font-bold rounded-xl border-2 border-slate-300 transition-colors shadow-xs cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Retry Quiz</span>
               </button>
               <button
                 onClick={onClose}
-                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm"
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
               >
                 Back to Words
               </button>

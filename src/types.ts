@@ -20,6 +20,8 @@ export interface WordItem {
   synonyms?: string[];
   examples: [string, string];
   etymology?: string; // Latin / Greek root breakdown
+  imageUrl: string; // Visual illustration depicting the concept
+  imageCaption?: string; // Caption explaining the visual metaphor
   ieltsBandContext?: string; // e.g., "High-scoring in IELTS Speaking Part 3 & Writing Task 2"
 }
 

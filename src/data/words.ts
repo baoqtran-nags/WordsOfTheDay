@@ -10,6 +10,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'A fundamental change in approach, methodology, or underlying philosophical assumptions within a discipline or industry.',
     etymology: 'Greek παράδειγμα (paradeigma) from para- ("alongside, beyond") + deiknynai ("to show, point out") — literally "a pattern or exemplar shown alongside". Coined in scientific philosophy by Thomas Kuhn (1962).',
+    imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A quantum leap in scientific observation redefining foundational worldviews.',
     collocations: ['trigger a paradigm shift', 'major paradigm shift', 'fundamental paradigm shift'],
     synonyms: ['sea change', 'groundbreaking transition', 'reconceptualization'],
     examples: [
@@ -27,6 +29,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'A legal, moral, and ethical obligation of one party to act solely in the best financial and strategic interest of another party.',
     etymology: 'Latin fiduciarius from fiducia ("trust, confidence"), rooted in fides ("faith, trust", source of fidelity, bona fide, and confide).',
+    imageUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'The sacred scales of justice balancing legal stewardship and trustee integrity.',
     collocations: ['breach of fiduciary duty', 'fiduciary responsibility', 'uphold fiduciary duties'],
     synonyms: ['trusteeship obligation', 'statutory loyalty', 'custodial mandate'],
     examples: [
@@ -44,6 +48,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'Present, appearing, or found everywhere simultaneously; pervasive in daily workflow or ecosystem architecture.',
     etymology: 'Latin ubique ("everywhere"), formed from ubi ("where") + the generalizing suffix -que ("anywhere, everywhere"). Related to ubiquity.',
+    imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Digital connectivity spanning simultaneously across global devices and workspaces.',
     collocations: ['ubiquitous computing', 'become ubiquitous', 'ubiquitous presence'],
     synonyms: ['omnipresent', 'pervasive', 'universal'],
     examples: [
@@ -61,6 +67,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'The simultaneous purchase and sale of an asset in different markets to exploit minute price differentials with negligible risk.',
     etymology: 'Latin arbitrator ("judge, umpire") via Old French arbitrage ("settlement by an arbiter, giving judgment") from arbiter ("one who goes to see or judge a matter").',
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'High-frequency financial market spreads captured across dual currency exchange tickers.',
     collocations: ['regulatory arbitrage', 'spatial arbitrage', 'exploit an arbitrage opportunity'],
     synonyms: ['price discrepancy exploitation', 'riskless spread', 'market equilibrium trade'],
     examples: [
@@ -78,6 +86,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To generate a noticeable, measurable, and consequential impact on a key performance metric or strategic outcome.',
     etymology: 'Metaphorical idiom originating from early 20th-century dial gauges, barometers, and scientific telemetry meters, where needle deflection denoted registered electrical charge or pressure change.',
+    imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A dynamic growth analytics gauge registering an upward surge in key milestones.',
     collocations: ['significantly move the needle', 'fail to move the needle', 'needle-moving initiative'],
     synonyms: ['yield demonstrable impact', 'catalyze measurable change', 'shift key metrics'],
     examples: [
@@ -95,6 +105,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'The capacity or power to produce a desired or intended therapeutic or empirical result under controlled experimental conditions.',
     etymology: 'Latin efficacia from efficax ("effectual, powerful"), derived from efficere ("to accomplish, work out"), from ex- ("out, thoroughly") + facere ("to make, do").',
+    imageUrl: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Rigorous laboratory assays verifying molecular therapeutic potencies under clinical protocols.',
     collocations: ['clinical efficacy', 'demonstrate efficacy', 'comparative efficacy trial'],
     synonyms: ['effectiveness', 'therapeutic potency', 'operational efficiency'],
     examples: [
@@ -112,6 +124,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To gradually extinguish a debt through scheduled periodic payments, or to apportion the cost of an intangible asset over its operational lifetime.',
     etymology: 'Latin ad- ("to") + mortuus / mors ("death") via Anglo-French amortir ("to extinguish, deaden, alienate in mortmain") — literally to "kill off" or extinguish a financial liability over time.',
+    imageUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Scheduled ledger allocations steadily extinguishing capital depreciation step-by-step.',
     collocations: ['amortize a loan', 'amortization schedule', 'amortize capital expenditure'],
     synonyms: ['write off over time', 'depreciate incrementally', 'liquidate systematically'],
     examples: [
@@ -129,6 +143,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'Having knowledge or being fully conscious and aware of pertinent contextual factors, risks, or stakeholder sensitivities.',
     etymology: 'Latin cognoscere ("to get to know, recognize, investigate"), formed from co- ("together, thoroughly") + gnoscere ("to know", PIE root *gno-, source of know, diagnosis, and ignore).',
+    imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Attentive executive leaders maintaining deep strategic awareness around board deliberations.',
     collocations: ['fully cognizant of the risks', 'remain cognizant of', 'cognizant of cultural nuances'],
     synonyms: ['acutely mindful of', 'apprised of', 'conscious of'],
     examples: [
@@ -146,6 +162,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'To secure against future loss, legal liability, or damage, or to legally compensate a party for harm incurred.',
     etymology: 'Latin indemnis ("unhurt, undamaged"), from in- ("not, un-") + damnum ("damage, financial loss, injury") + -ficare (from facere "to make"). Literally "to keep free from damage".',
+    imageUrl: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A formal binding corporate covenant shielding stakeholders against statutory exposure.',
     collocations: ['indemnify against claims', 'indemnity clause', 'hold harmless and indemnify'],
     synonyms: ['reimburse', 'insure against liability', 'exonerate from damages'],
     examples: [
@@ -163,6 +181,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'Relating to the interaction or cooperation of two or more entities/subsystems producing a combined effect greater than the sum of their individual components.',
     etymology: 'Greek συνεργία (synergia "joint work, cooperation"), from syn- ("together, with") + ergon ("work, action", root of energy and ergonomics).',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Interlocking team intellects compounding collaborative outcomes far beyond individual efforts.',
     collocations: ['synergistic relationship', 'exploit synergistic gains', 'synergistic effect'],
     synonyms: ['mutually reinforcing', 'collaborative', 'symbiotic'],
     examples: [
@@ -180,6 +200,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'To eliminate intermediaries or middlemen from a supply chain, financial transaction, or distribution channel.',
     etymology: 'Modern compound from Latin dis- ("away, apart") + intermedius ("standing between, intermediate"), from inter ("between") + medius ("middle").',
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Direct peer-to-peer data nodes bypassing traditional centralized broker hubs.',
     collocations: ['disintermediate traditional brokers', 'disintermediation of banking', 'disintermediate supply chains'],
     synonyms: ['bypass middlemen', 'streamline distribution', 'de-broker'],
     examples: [
@@ -197,6 +219,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'The deceptive practice of exaggerating, fabricating, or misleadingly framing environmental credentials to burnish public relations without genuine ecological impact.',
     etymology: 'Portmanteau of green ("environmentalism") + whitewash (from Old English hwīt + wascan, metaphorically "to gloss over defects or apply a deceptive superficial coat"). Coined in 1986 by environmentalist Jay Westerveld.',
+    imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Cosmetic eco-friendly branding contrasted with industrial carbon footprints.',
     collocations: ['accused of greenwashing', 'corporate greenwashing', 'stringent anti-greenwashing regulations'],
     synonyms: ['eco-posturing', 'performative environmentalism', 'cosmetic ESG marketing'],
     examples: [
@@ -214,6 +238,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'A circumstance, tool, or strategy that presents substantial strategic advantages alongside equally dangerous liabilities or risks.',
     etymology: 'Ancient martial and biblical metaphor (Hebrews 4:12) describing a two-edged blade that cuts in both directions, injuring the wielder if misdirected.',
+    imageUrl: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A bifurcated instrument capable of rapid breakthrough or severe unintended consequence.',
     collocations: ['prove to be a double-edged sword', 'wield a double-edged sword', 'inherent double-edged sword'],
     synonyms: ['mixed blessing', 'two-fold consequence', 'bifurcated risk profile'],
     examples: [
@@ -231,6 +257,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'An acute, short-term shortage of liquid capital or easily convertible assets across financial institutions or within a firm.',
     etymology: 'Latin liquidus ("fluid, flowing, clear", from liquere "to be fluid") + onomatopoeic Middle English crunchen ("to crush under pressure"), signifying crushing pressure on cash flow.',
+    imageUrl: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Shrinking cash reserves creating systemic pressure on immediate transaction settlements.',
     collocations: ['suffer a liquidity crunch', 'trigger a systemic liquidity crunch', 'navigate a liquidity crunch'],
     synonyms: ['cash-flow insolvency', 'liquidity deficit', 'credit contraction'],
     examples: [
@@ -248,6 +276,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'Intended or formulated to prevent disease, systemic breakdown, or adverse outcomes beforehand rather than curing symptoms reactively.',
     etymology: 'Greek προφυλακτικός (prophylaktikos "guarding against"), from pro- ("before, in front") + phylax / phylassein ("guard, watcher"). Related to anaphylaxis.',
+    imageUrl: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Preemptive medical inoculation insulating cellular systems before pathogen exposure.',
     collocations: ['prophylactic measure', 'prophylactic treatment', 'administer prophylactic antibodies'],
     synonyms: ['preventative', 'preemptive', 'protective hedge'],
     examples: [
@@ -265,6 +295,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To attempt an impossibly large, over-scoped, or futile task instead of concentrating on prioritized, high-leverage deliverables.',
     etymology: '20th-century management metaphor popularized by McKinsey strategy consultants and attributed humorously to Will Rogers discussing impossible geopolitical remedies.',
+    imageUrl: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'An endless expanse of ocean illustrating the folly of uncontrolled project scope.',
     collocations: ['try to boil the ocean', 'risk boiling the ocean', 'avoid boiling the ocean'],
     synonyms: ['over-complicate scope', 'pursue intractable objectives', 'overreach operational capacity'],
     examples: [
@@ -282,6 +314,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'The statistical evaluation of user touchpoints across multi-channel journeys to quantify the relative contribution of each marketing channel to final conversions.',
     etymology: 'Latin attributio from attribuere ("to assign, allot, ascribe"), from ad- ("to") + tribuere ("to assign, grant, pay as tribute", root of contribute and distribute).',
+    imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Multi-touchpoint consumer funnel analytics mapping attribution across digital channels.',
     collocations: ['multi-touch attribution modeling', 'first-touch attribution modeling', 'algorithmic attribution modeling'],
     synonyms: ['conversion weighting analysis', 'channel efficacy mapping', 'touchpoint valuation'],
     examples: [
@@ -299,6 +333,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'The philosophy, science, or body of legal principles and doctrine that guides the theoretical interpretation of statutory law and precedents.',
     etymology: 'Latin jurisprudentia from juris ("of right, of law", genitive of jus) + prudentia ("knowledge, foresight, practical wisdom", contraction of providentia).',
+    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A classical legal library reflecting centuries of judicial precedents and jurisprudence.',
     collocations: ['constitutional jurisprudence', 'established jurisprudence', 'evolve legal jurisprudence'],
     synonyms: ['legal doctrine', 'legal philosophy', 'judicial precedent'],
     examples: [
@@ -316,6 +352,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'The time delay between the initiation of a request or stimulus and the corresponding execution, transmission, or physical response.',
     etymology: 'Latin latentia from latere ("to lie hidden, lurk, concealed", source of latent). In physics & computing, describes inactive or dormant transit delay.',
+    imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'High-speed fiber-optic pulses measuring sub-millisecond signal propagation latency.',
     collocations: ['low latency', 'ultra-low latency architecture', 'latency reduction'],
     synonyms: ['transmission lag', 'propagation delay', 'response interval'],
     examples: [
@@ -333,6 +371,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To inadvertently discard valuable, functional, or essential components while attempting to purge defective or undesirable elements.',
     etymology: 'German proverb "das Kind mit dem Bade ausschütten", first recorded in Thomas Murner’s satire Narrenbeschwörung (1512); introduced into English by Thomas Carlyle in 1849.',
+    imageUrl: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A delicate balance between filtering out impurities without losing core treasures.',
     collocations: ['risk throwing the baby out with the bathwater', 'caution against throwing the baby out with the bathwater'],
     synonyms: ['discard the essential along with the trivial', 'over-correct destructively', 'reckless elimination'],
     examples: [
@@ -350,6 +390,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'Naturally accompanying, associated with, or occurring concurrently as a secondary consequence of an existing condition or phenomenon.',
     etymology: 'Latin concomitari ("to accompany"), from com- ("together, with") + comitari ("to follow as a companion", from comes "companion, count").',
+    imageUrl: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Interconnected physiological pathways where one intervention triggers concomitant biological reactions.',
     collocations: ['concomitant risk', 'concomitant therapies', 'concomitant rise in inflation'],
     synonyms: ['attendant', 'co-occurring', 'synchronous'],
     examples: [
@@ -367,6 +409,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'The principle that information, risks, or disclosures are substantial and consequential enough to influence the economic or ethical decisions of reasonable investors and stakeholders.',
     etymology: 'Late Latin materialitas from materia ("substance, wood, matter"). In legal and corporate accounting, refers to substantive substance versus trivial form.',
+    imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A transparent ESG corporate governance matrix assessing financial impact materiality.',
     collocations: ['double materiality assessment', 'financial materiality', 'materiality threshold'],
     synonyms: ['substantive relevance', 'consequential significance', 'decision-criticality'],
     examples: [
@@ -384,6 +428,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To independently take ownership of an initiative, project, or opportunity and advance it through execution without requiring continuous supervision.',
     etymology: 'Sports idiom derived from American football and rugby, where receiving possession of the ball requires decisive, uninterrupted forward momentum.',
+    imageUrl: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Decisive leadership taking immediate proactive possession and driving goalward.',
     collocations: ['empower someone to run with the ball', 'take initiative and run with the ball'],
     synonyms: ['exercise proactive ownership', 'spearhead execution', 'seize the initiative'],
     examples: [
@@ -401,6 +447,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'A practical, rule-of-thumb method or cognitive shortcut that is not guaranteed to be theoretically optimal, but sufficient for immediate problem-solving.',
     etymology: 'Greek εὑρίσκειν (heuriskein "to find, discover", the same root as Archimedes’ exclamation Eureka!).',
+    imageUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Mathematical compass and mental shortcuts illuminating practical navigation paths.',
     collocations: ['heuristic algorithm', 'cognitive heuristic', 'heuristic evaluation'],
     synonyms: ['rule-of-thumb rule', 'practical shortcut', 'approximation technique'],
     examples: [
@@ -418,6 +466,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'A favor, concession, or advantage granted in explicit return for something of equivalent strategic or reciprocal value.',
     etymology: 'New Latin phrase literally meaning "something for something" (quid "what/something", pro "for", quo "which/what"). Originally used by apothecaries substituting one medicine for another.',
+    imageUrl: 'https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A firm reciprocal handshake sealing mutual bilateral concessions.',
     collocations: ['explicit quid pro quo', 'quid pro quo arrangement', 'negotiate on a quid pro quo basis'],
     synonyms: ['reciprocal concession', 'tit for tat', 'compensatory exchange'],
     examples: [
@@ -435,6 +485,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'To make an intolerable, deficient, or painful condition significantly better, more bearable, or manageable.',
     etymology: 'Latin meliorare ("to improve, make better"), from melior ("better", comparative of bonus). Altered by association with French améliorer.',
+    imageUrl: 'https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Restorative sunshine breaking through storm clouds to heal damaged ecosystems.',
     collocations: ['ameliorate working conditions', 'ameliorate the effects of inflation', 'policies to ameliorate poverty'],
     synonyms: ['mitigate', 'alleviate', 'rectify'],
     examples: [
@@ -452,6 +504,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'To surrender unconditionally, cease resistance to an opponent or demand, or in finance, when distressed investors dump assets en masse at cycle bottoms.',
     etymology: 'Medieval Latin capitulare ("to draw up articles of agreement, surrender on terms"), from capitulum ("chapter, heading, little head", diminutive of caput "head").',
+    imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A capitulation point on financial charts where long sellers finally surrender to market forces.',
     collocations: ['market capitulation', 'refuse to capitulate', 'capitulate to regulatory pressure'],
     synonyms: ['succumb', 'relinquish resistance', 'yield under duress'],
     examples: [
@@ -469,6 +523,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'To briefly establish communication or contact with someone to provide a status update, confirm alignment, or review progress.',
     etymology: 'American baseball idiom referring to a base runner physically touching a base to ensure safe status before proceeding to the next plate.',
+    imageUrl: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A brief, cordial check-in sync aligning colleagues on weekly goals.',
     collocations: ['touch base offline', 'touch base briefly', 'schedule a quick sync to touch base'],
     synonyms: ['reconvene briefly', 'sync up', 'establish alignment'],
     examples: [
@@ -486,6 +542,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C2',
     definition: 'To formally forbid, condemn, or outlaw an action by statutory decree or authoritative regulation (distinguish from prescribe).',
     etymology: 'Latin proscribere ("to publish in writing, outlaw, banish"), from pro- ("before, publicly") + scribere ("to write"). In ancient Rome, public posting of names doomed to forfeiture of citizenship or execution.',
+    imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'Statutory legal decrees explicitly proscribing unlawful actions.',
     collocations: ['statute proscribes insider trading', 'strictly proscribed conduct', 'proscribe unfair trade practices'],
     synonyms: ['prohibit formally', 'outlaw', 'interdict'],
     examples: [
@@ -503,6 +561,8 @@ export const VOCABULARY_DATABASE: WordItem[] = [
     level: 'C1',
     definition: 'Most noticeable, prominent, or strategically important; conspicuous in cognition and driving customer mental availability.',
     etymology: 'Latin saliens / salire ("to leap, spring up"). In heraldry and military strategy, an angle leaping outward towards enemy lines, hence that which leaps out to the senses or mind.',
+    imageUrl: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop',
+    imageCaption: 'A single brilliant beacon leaping out conspicuously from a quiet backdrop.',
     collocations: ['salient feature', 'brand salience', 'most salient point'],
     synonyms: ['prominent', 'pivotal', 'conspicuous'],
     examples: [
