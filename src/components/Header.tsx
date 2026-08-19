@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 
 interface HeaderProps {
@@ -27,10 +27,10 @@ export const Header: React.FC<HeaderProps> = ({
   showSavedOnly,
   activeCount
 }) => {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
+  const todayFormatted = new Date().toLocaleDateString('en-US', {
+    month: 'long',
     day: 'numeric',
+    year: 'numeric',
   });
 
   return (
@@ -56,9 +56,17 @@ export const Header: React.FC<HeaderProps> = ({
                   IELTS 6.5–8.0 • VSTEP C1
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                Advanced industry English, corporate idioms & academic precision • {currentDate}
-              </p>
+              {/* Added explicit "Today is [month, day, year]" line */}
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-700 bg-indigo-50/80 px-2 py-0.5 rounded-md border border-indigo-100">
+                  <Calendar className="w-3 h-3 text-indigo-600" />
+                  Today is {todayFormatted}
+                </span>
+                <span className="text-slate-300 hidden sm:inline">•</span>
+                <p className="text-xs text-slate-500 font-medium">
+                  Specialized industry English, corporate idioms & academic precision
+                </p>
+              </div>
             </div>
           </div>
 
