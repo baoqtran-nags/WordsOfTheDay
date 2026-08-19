@@ -13,6 +13,7 @@ interface WordCardProps {
   onToggleSave: (id: string) => void;
   onToggleLearned: (id: string) => void;
   onShowToast: (text: string, type: 'success' | 'info' | 'error') => void;
+  totalWordsInSet?: number;
 }
 
 export const WordCard: React.FC<WordCardProps> = ({
@@ -22,7 +23,8 @@ export const WordCard: React.FC<WordCardProps> = ({
   isLearned,
   onToggleSave,
   onToggleLearned,
-  onShowToast
+  onShowToast,
+  totalWordsInSet = 10,
 }) => {
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [playingSentenceIndex, setPlayingSentenceIndex] = useState<number | null>(null);
@@ -211,23 +213,41 @@ export const WordCard: React.FC<WordCardProps> = ({
     <motion.article
       id={`word-card-${item.id}`}
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{
-        duration: 0.35,
-        delay: index * 0.03,
+        duration: 0.3,
+        delay: Math.min(index * 0.03, 0.2),
         ease: 'easeOut',
       }}
-      className={`snap-start scroll-mt-6 rounded-2xl border-2 shadow-md border-t-8 ${theme.borderTop} p-5 sm:p-7 flex flex-col md:flex-row gap-6 hover:shadow-xl transition-all w-full relative ${
+      className={`snap-start scroll-mt-3 sm:scroll-mt-6 rounded-2xl border-2 shadow-md border-t-6 sm:border-t-8 ${theme.borderTop} p-4 sm:p-6 md:p-7 flex flex-col md:flex-row gap-4 sm:gap-6 hover:shadow-xl transition-all w-full relative overflow-hidden ${
         isLearned
           ? 'bg-emerald-50/40 border-emerald-300'
           : 'bg-white border-slate-200'
       }`}
     >
-      {/* Learned Badge Indicator */}
+      {/* Mobile Index & Learned Indicator Bar */}
+      <div className="flex items-center justify-between gap-2 md:hidden pb-1 border-b border-slate-100">
+        <span className="text-[11px] font-black text-indigo-900 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+          Thẻ {index + 1} / {totalWordsInSet}
+        </span>
+
+        {isLearned ? (
+          <span className="flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Đã thuộc
+          </span>
+        ) : (
+          <span className="text-[11px] font-semibold text-slate-400">
+            Chưa học
+          </span>
+        )}
+      </div>
+
+      {/* Desktop Learned Badge Indicator */}
       {isLearned && (
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-black shadow-sm">
+        <div className="hidden md:flex absolute top-4 right-4 z-10 items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-black shadow-sm">
           <CheckCircle2 className="w-3.5 h-3.5" />
           <span>ĐÃ HỌC • LEARNED</span>
         </div>
@@ -236,9 +256,9 @@ export const WordCard: React.FC<WordCardProps> = ({
       {/* Left Column: Visual Illustration & Core Identity */}
       <div className="w-full md:w-5/12 lg:w-4/12 shrink-0 flex flex-col justify-between">
         <div>
-          {/* Illustration Container */}
+          {/* Illustration Container - Snug on mobile phones */}
           {item.imageUrl && !imgError && (
-            <div className="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-3.5 group/img shadow-2xs">
+            <div className="relative w-full h-36 sm:h-48 md:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-3 group/img shadow-2xs">
               <img
                 src={item.imageUrl}
                 alt={item.word}
@@ -248,7 +268,7 @@ export const WordCard: React.FC<WordCardProps> = ({
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-              <div className="absolute bottom-2 left-3 right-3 text-amber-200 text-xs font-bold line-clamp-1 drop-shadow-md">
+              <div className="absolute bottom-1.5 left-2.5 right-2.5 text-amber-200 text-[11px] sm:text-xs font-bold line-clamp-1 drop-shadow-md">
                 {item.imageCaption || `Metaphor: ${item.word}`}
               </div>
             </div>
@@ -258,22 +278,22 @@ export const WordCard: React.FC<WordCardProps> = ({
           <div className="flex items-center justify-between gap-2">
             <h3 
               onClick={() => handleListenWord()}
-              className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif] hover:text-indigo-600 transition-colors cursor-pointer"
+              className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif] hover:text-indigo-600 transition-colors cursor-pointer break-words"
               title="Click để nghe phát âm từ vựng (Web Speech API)"
             >
               {item.word}
             </h3>
 
-            {/* Main Speaker Pronunciation Button */}
+            {/* Main Speaker Pronunciation Button (Min touch target 44px on mobile) */}
             <button
               id={`btn-listen-${item.id}`}
               onClick={handleListenWord}
               disabled={isPlayingWord}
               aria-label={`Listen to pronunciation of ${item.word}`}
-              className={`p-2.5 rounded-xl transition-all border cursor-pointer shrink-0 flex items-center justify-center ${
+              className={`min-w-[44px] min-h-[44px] p-2.5 rounded-xl transition-all border cursor-pointer shrink-0 flex items-center justify-center ${
                 isPlayingWord
                   ? 'bg-indigo-600 text-white border-indigo-700 shadow-md ring-2 ring-indigo-300 scale-105'
-                  : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border-indigo-200 hover:shadow-xs'
+                  : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border-indigo-200 hover:shadow-xs active:scale-95'
               }`}
               title="Nghe phát âm chuẩn (Web Speech API)"
             >
@@ -284,34 +304,35 @@ export const WordCard: React.FC<WordCardProps> = ({
           {/* Phonetics IPA with Click-to-Listen */}
           <div 
             onClick={() => handleListenWord()}
-            className="flex items-center gap-1.5 text-sm sm:text-base font-mono text-slate-600 font-bold mt-1 cursor-pointer hover:text-indigo-600 transition-colors group"
+            className="flex items-center gap-1.5 text-sm sm:text-base font-mono text-slate-600 font-bold mt-0.5 sm:mt-1 cursor-pointer hover:text-indigo-600 transition-colors group"
             title="Click to listen to IPA pronunciation"
           >
             <span>{item.ipa}</span>
             <span className="text-[10px] text-slate-400 group-hover:text-indigo-500 font-sans font-semibold">🔊 US</span>
           </div>
 
-          <div className="flex items-center gap-2 mt-2.5 flex-wrap">
-            <span className={`text-xs font-black uppercase px-2.5 py-1 rounded-md border ${theme.badgeBg}`}>
+          {/* Chips & Tags - With nowrap to prevent tag breakage */}
+          <div className="flex items-center gap-1.5 sm:gap-2 mt-2 flex-wrap">
+            <span className={`text-[11px] sm:text-xs font-black uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border whitespace-nowrap ${theme.badgeBg}`}>
               {item.industry}
             </span>
-            <span className={`text-xs font-bold uppercase tracking-wider ${theme.typeText}`}>
+            <span className={`text-[11px] sm:text-xs font-bold uppercase tracking-wider whitespace-nowrap ${theme.typeText}`}>
               {item.type}
             </span>
-            <span className="text-xs font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-300">
+            <span className="text-[11px] sm:text-xs font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-300 whitespace-nowrap">
               {item.level}
             </span>
           </div>
         </div>
 
-        {/* Action Buttons: Mark as Learned + Save + Copy */}
-        <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-slate-200/80">
+        {/* Action Buttons: Mark as Learned + Save + Copy (44px min touch target) */}
+        <div className="flex flex-col gap-2 mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-200/80">
           
           {/* Primary "Đã học / Mark as Learned" Button */}
           <button
             id={`btn-learned-${item.id}`}
             onClick={() => onToggleLearned(item.id)}
-            className={`w-full py-2.5 px-3 rounded-xl border-2 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+            className={`w-full min-h-[44px] py-2.5 px-3 rounded-xl border-2 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-98 ${
               isLearned
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700'
                 : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300'
@@ -326,7 +347,7 @@ export const WordCard: React.FC<WordCardProps> = ({
             <button
               id={`btn-save-${item.id}`}
               onClick={() => onToggleSave(item.id)}
-              className={`flex-1 py-2 px-3 rounded-xl border-2 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+              className={`flex-1 min-h-[44px] py-2 px-3 rounded-xl border-2 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer active:scale-98 ${
                 isSaved
                   ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-2xs'
                   : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
@@ -339,22 +360,22 @@ export const WordCard: React.FC<WordCardProps> = ({
             <button
               id={`btn-copy-${item.id}`}
               onClick={handleCopy}
-              className="py-2 px-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer"
+              className="min-h-[44px] py-2 px-3 rounded-xl bg-slate-50 border-2 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer active:scale-98"
               title="Copy Word Details & 3 IELTS Examples"
             >
               {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-500" />}
-              <span>{isCopied ? 'Đã sao chép' : 'Sao chép'}</span>
+              <span>{isCopied ? 'Đã chép' : 'Sao chép'}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Right Column: Definition, Roots, 3 Context-Aware Academic Examples & Collocations */}
-      <div className="flex-1 flex flex-col justify-between border-t-2 md:border-t-0 md:border-l-2 border-slate-200/70 pt-4 md:pt-0 md:pl-6">
+      <div className="flex-1 flex flex-col justify-between border-t-2 md:border-t-0 md:border-l-2 border-slate-200/70 pt-3 sm:pt-4 md:pt-0 md:pl-6">
         <div>
           {/* Definition */}
-          <div className="mb-3.5">
-            <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-1">
+          <div className="mb-3">
+            <span className="text-[11px] sm:text-xs font-black text-slate-400 uppercase tracking-wider block mb-1">
               Definition & Strategic Meaning
             </span>
             <p className="text-base sm:text-lg md:text-xl text-slate-900 font-semibold leading-relaxed">
@@ -364,18 +385,20 @@ export const WordCard: React.FC<WordCardProps> = ({
 
           {/* Etymology Section */}
           {item.etymology && (
-            <div className="mb-3.5">
+            <div className="mb-3">
               <button
                 id={`btn-etymology-${item.id}`}
                 onClick={() => setIsEtymologyOpen(!isEtymologyOpen)}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-indigo-700 transition-colors py-1.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-indigo-700 transition-colors py-2 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 cursor-pointer min-h-[40px]"
               >
-                <History className="w-4 h-4 text-indigo-600" />
-                <span>Etymology & Roots (Latin / Greek)</span>
+                <div className="flex items-center gap-1.5">
+                  <History className="w-4 h-4 text-indigo-600" />
+                  <span>Etymology & Roots (Latin / Greek)</span>
+                </div>
                 {isEtymologyOpen ? (
-                  <ChevronUp className="w-4 h-4 text-slate-600" />
+                  <ChevronUp className="w-4 h-4 text-slate-600 shrink-0" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-slate-600" />
+                  <ChevronDown className="w-4 h-4 text-slate-600 shrink-0" />
                 )}
               </button>
 
@@ -388,8 +411,8 @@ export const WordCard: React.FC<WordCardProps> = ({
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className={`mt-2.5 p-3.5 rounded-xl border-2 text-sm sm:text-base leading-relaxed ${theme.etymBg}`}>
-                      <span className={`font-black text-xs sm:text-sm uppercase tracking-wider block mb-1 ${theme.etymLabel}`}>
+                    <div className={`mt-2 p-3 sm:p-3.5 rounded-xl border-2 text-xs sm:text-sm md:text-base leading-relaxed ${theme.etymBg}`}>
+                      <span className={`font-black text-[11px] sm:text-xs uppercase tracking-wider block mb-1 ${theme.etymLabel}`}>
                         Morphological Origin & Root Breakdown:
                       </span>
                       <p className="text-slate-900 font-normal leading-relaxed">
@@ -403,12 +426,12 @@ export const WordCard: React.FC<WordCardProps> = ({
           )}
 
           {/* 3 Context-Aware Academic Examples (IELTS C1/C2 Academic Standards) */}
-          <div className="bg-slate-50 p-4 rounded-xl border-2 border-slate-200 space-y-3">
-            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/80">
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-indigo-600" />
-                <span className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                  3 Context-Aware Academic Examples (IELTS Band 8.0–9.0):
+          <div className="bg-slate-50 p-3 sm:p-4 rounded-xl border-2 border-slate-200 space-y-2.5 sm:space-y-3">
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/80 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <GraduationCap className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span className="text-[11px] sm:text-xs font-black text-slate-800 uppercase tracking-wider">
+                  3 Academic Examples (Band 8.0+):
                 </span>
               </div>
 
@@ -416,42 +439,42 @@ export const WordCard: React.FC<WordCardProps> = ({
               <button
                 onClick={handleToggleAltExamples}
                 disabled={isFetchingAlt}
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded-lg transition-colors cursor-pointer ml-auto"
                 title="Tạo các ngữ cảnh học thuật thay thế khác"
               >
                 <RefreshCw className={`w-3 h-3 ${isFetchingAlt ? 'animate-spin' : ''}`} />
-                <span>{isAlternativeMode ? 'Xem ví dụ chuẩn' : 'Ngữ cảnh mở rộng'}</span>
+                <span>{isAlternativeMode ? 'Ví dụ chuẩn' : 'Mở rộng'}</span>
               </button>
             </div>
 
             {/* Render 3 Distinct Context Scenarios */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {currentScenarios.map((scenario, sIdx) => {
                 const isThisPlaying = playingSentenceIndex === sIdx;
                 return (
                   <div
                     key={sIdx}
-                    className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-1.5 transition-all hover:border-slate-300"
+                    className="p-2.5 sm:p-3 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-1.5 transition-all hover:border-slate-300"
                   >
                     {/* Context Header with Category Badge & Speaker */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded border ${scenario.badgeColor}`}>
+                        <span className={`text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded border whitespace-nowrap ${scenario.badgeColor}`}>
                           {scenario.badge}
                         </span>
-                        <span className="text-[11px] font-bold text-slate-500">
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-500">
                           {scenario.category}
                         </span>
                       </div>
 
-                      {/* Speaker Pronunciation for this exact sentence */}
+                      {/* Speaker Pronunciation for this exact sentence (36px touch target) */}
                       <button
                         onClick={(e) => handleListenSentence(scenario.sentence, sIdx, e)}
                         disabled={isThisPlaying}
-                        className={`p-1.5 rounded-lg border transition-colors cursor-pointer shrink-0 ${
+                        className={`min-w-[34px] min-h-[34px] p-1.5 rounded-lg border transition-colors cursor-pointer shrink-0 flex items-center justify-center ${
                           isThisPlaying
                             ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs ring-1 ring-indigo-300 scale-105'
-                            : 'bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-700 border-slate-200'
+                            : 'bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-700 border-slate-200 active:scale-95'
                         }`}
                         title={`Nghe phát âm câu ${sIdx + 1} (Web Speech API)`}
                       >
@@ -460,14 +483,14 @@ export const WordCard: React.FC<WordCardProps> = ({
                     </div>
 
                     {/* Sentence text with highlighted target vocabulary */}
-                    <p className="text-sm sm:text-base text-slate-900 leading-relaxed font-medium">
+                    <p className="text-xs sm:text-sm md:text-base text-slate-900 leading-relaxed font-medium">
                       “{renderHighlightedSentence(scenario.sentence, item.word)}”
                     </p>
 
                     {/* Syntactic & Academic Commentary */}
                     {scenario.syntacticNote && (
-                      <p className="text-[11px] text-slate-500 italic pt-0.5 border-t border-slate-100">
-                        💡 <span className="font-semibold text-slate-600">Band 8.5+ Feature:</span> {scenario.syntacticNote}
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 italic pt-0.5 border-t border-slate-100">
+                        💡 <span className="font-semibold text-slate-600">Band 8.5+:</span> {scenario.syntacticNote}
                       </p>
                     )}
                   </div>
@@ -479,11 +502,11 @@ export const WordCard: React.FC<WordCardProps> = ({
 
         {/* Collocations */}
         {item.collocations && item.collocations.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-slate-200/70 flex items-center gap-2 text-xs sm:text-sm text-slate-600 flex-wrap">
-            <Tag className="w-4 h-4 text-indigo-600 shrink-0" />
-            <span className="font-bold text-slate-800">Collocations:</span>
+          <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-200/70 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-slate-600 flex-wrap">
+            <Tag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 shrink-0" />
+            <span className="font-bold text-slate-800 text-[11px] sm:text-xs">Collocations:</span>
             {item.collocations.map((col, idx) => (
-              <span key={idx} className="bg-slate-100 px-2.5 py-0.5 rounded-md text-xs sm:text-sm text-slate-900 border border-slate-200 font-bold">
+              <span key={idx} className="bg-slate-100 px-2 py-0.5 rounded-md text-[11px] sm:text-xs text-slate-900 border border-slate-200 font-bold whitespace-nowrap">
                 {col}
               </span>
             ))}

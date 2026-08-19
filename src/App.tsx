@@ -606,6 +606,7 @@ export default function App() {
                       onToggleSave={handleToggleSave}
                       onToggleLearned={handleToggleLearned}
                       onShowToast={showToast}
+                      totalWordsInSet={displayWords.length}
                     />
                   ))}
                 </AnimatePresence>
