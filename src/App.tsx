@@ -8,12 +8,18 @@ import { PracticeModal } from './components/PracticeModal';
 import { ReviewModeModal } from './components/ReviewModeModal';
 import { GlossaryDrawer } from './components/GlossaryDrawer';
 import { WordOfTheHour } from './components/WordOfTheHour';
+import { StudyModeModal } from './components/StudyModeModal';
 import { Toast, ToastMessage } from './components/Toast';
 import { FontSizeMode } from './components/Header';
-import { loadStreakData, recordDailyCompletion } from './utils/streak';
+import { loadStreakData, recordDailyCompletion, getLocalDateString } from './utils/streak';
 import { triggerStreakCelebrationConfetti } from './utils/confetti';
 import { loadLearnedWordsMeta, saveWordLearnedMeta, getWordsDueForReview } from './utils/reviewRetention';
 import { evaluateAchievements, loadAchievements, UserStats } from './utils/achievements';
+import {
+  getDailyWordsForDate,
+  getDailyQuoteForDate,
+  getMillisecondsUntilMidnight,
+} from './utils/dailyWordGenerator';
 import {
   GraduationCap,
   Bookmark,
@@ -29,17 +35,28 @@ import {
   Type,
   BookOpen,
   Sparkles,
+  Play,
+  Calendar,
+  Layers,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
-  const [currentWords, setCurrentWords] = useState<WordItem[]>([]);
-  const [currentQuote, setCurrentQuote] = useState<QuoteItem>(QUOTE_DATABASE[0]);
+  const [currentDateStr, setCurrentDateStr] = useState<string>(() => getLocalDateString());
+  const [currentWords, setCurrentWords] = useState<WordItem[]>(() =>
+    getDailyWordsForDate(getLocalDateString(), 'All')
+  );
+  const [currentQuote, setCurrentQuote] = useState<QuoteItem>(() =>
+    getDailyQuoteForDate(getLocalDateString())
+  );
+
   const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
   const [viewFilter, setViewFilter] = useState<'all' | 'unlearned' | 'learned' | 'saved'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [generationKey, setGenerationKey] = useState<number>(0);
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
+  const [isStudyModeOpen, setIsStudyModeOpen] = useState<boolean>(false);
+
   const [fontSizeMode, setFontSizeMode] = useState<FontSizeMode>(() => {
     try {
       const saved = localStorage.getItem('wotd_font_size');
@@ -66,7 +83,6 @@ export default function App() {
   const [learnedWordIds, setLearnedWordIds] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('wotd_learned_words');
-      // If empty on first visit, seed a few initial words so Review Mode (3+ days retention) is immediately testable
       return saved ? JSON.parse(saved) : ['w1', 'w2', 'w3', 'w4', 'w5'];
     } catch {
       return ['w1', 'w2', 'w3', 'w4', 'w5'];
@@ -113,6 +129,47 @@ export default function App() {
       setToast((curr) => (curr?.text === text ? null : curr));
     }, 3500);
   }, []);
+
+  // 12:00 AM (Midnight) Automatic Daily Word Update Routine
+  const handleMidnightRefresh = useCallback((newDateStr: string) => {
+    setCurrentDateStr(newDateStr);
+    const newDailyWords = getDailyWordsForDate(newDateStr, selectedIndustry);
+    const newDailyQuote = getDailyQuoteForDate(newDateStr);
+
+    setCurrentWords(newDailyWords);
+    setCurrentQuote(newDailyQuote);
+    setGenerationKey((k) => k + 1);
+
+    // Refresh streak data to reflect new day
+    setStreakData(loadStreakData());
+
+    showToast(
+      `✨ 12:00 AM: Đã tự động cập nhật 10 từ vựng của ngày mới (${newDateStr})!`,
+      'success'
+    );
+  }, [selectedIndustry, showToast]);
+
+  useEffect(() => {
+    // 1. One-shot timeout right at 12:00:00 AM
+    const msUntilMidnight = getMillisecondsUntilMidnight();
+    const midnightTimer = setTimeout(() => {
+      const nextDate = getLocalDateString();
+      handleMidnightRefresh(nextDate);
+    }, msUntilMidnight);
+
+    // 2. Periodic check every 30 seconds in case device was sleeping
+    const checkInterval = setInterval(() => {
+      const nowStr = getLocalDateString();
+      if (nowStr !== currentDateStr) {
+        handleMidnightRefresh(nowStr);
+      }
+    }, 30000);
+
+    return () => {
+      clearTimeout(midnightTimer);
+      clearInterval(checkInterval);
+    };
+  }, [currentDateStr, handleMidnightRefresh]);
 
   // Keyboard shortcut listener: ESC exits Focus Mode
   useEffect(() => {
@@ -256,12 +313,6 @@ export default function App() {
       showToast('Đã tạo 10 thẻ từ vựng minh họa mới của ngày', 'success');
     }, 250);
   }, [showToast]);
-
-  // Initial load with 10 words
-  useEffect(() => {
-    const initial10 = VOCABULARY_DATABASE.slice(0, 10);
-    setCurrentWords(initial10);
-  }, []);
 
   const handleSelectIndustry = (industry: string) => {
     setSelectedIndustry(industry);
@@ -446,11 +497,11 @@ export default function App() {
         </div>
       )}
 
-      {/* Main Layout Area */}
-      <div className={`w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 transition-all ${
+      {/* Main Layout Area - Snug mobile padding */}
+      <div className={`w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex-1 transition-all ${
         isFocusMode ? 'max-w-4xl' : 'max-w-7xl'
       }`}>
-        <div className={`flex items-start gap-8 ${isFocusMode ? 'justify-center' : 'flex-col lg:flex-row'}`}>
+        <div className={`flex items-start gap-6 lg:gap-8 ${isFocusMode ? 'justify-center' : 'flex-col lg:flex-row'}`}>
           
           {/* Left Column (Sticky Sidebar) - Completely hidden in Focus Mode */}
           {!isFocusMode && (
@@ -460,6 +511,7 @@ export default function App() {
                 isRefreshing={isRefreshing}
                 selectedIndustry={selectedIndustry}
                 onSelectIndustry={handleSelectIndustry}
+                onOpenStudyMode={() => setIsStudyModeOpen(true)}
                 onOpenGlossary={() => setIsGlossaryOpen(true)}
                 onOpenPractice={() => setIsPracticeOpen(true)}
                 onOpenReview={() => setIsReviewOpen(true)}
@@ -487,10 +539,41 @@ export default function App() {
           )}
 
           {/* Right Column: Scrollable Feed of 10 Word Cards */}
-          <main className={`w-full min-w-0 space-y-6 ${isFocusMode ? 'max-w-3xl mx-auto' : 'flex-1'}`}>
+          <main className={`w-full min-w-0 space-y-4 sm:space-y-6 ${isFocusMode ? 'max-w-3xl mx-auto' : 'flex-1'}`}>
             
+            {/* PRIMARY "VÀO HỌC NGAY" HERO BANNER (Distraction-Free 2-Page Mobile/Desktop Flashcard Experience) */}
+            <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border-2 border-indigo-700 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5 text-center sm:text-left">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/50 shrink-0">
+                  <BookOpen className="w-6 h-6 text-amber-300" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 justify-center sm:justify-start">
+                    <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/50 text-indigo-200 border border-indigo-400/40">
+                      Chế Độ Học Tối Ưu Cho Điện Thoại
+                    </span>
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-black text-white mt-1 tracking-tight">
+                    Vào Học 10 Từ Hôm Nay (1-2 Trang Chuẩn Di Động)
+                  </h2>
+                  <p className="text-xs sm:text-sm text-indigo-200 font-medium">
+                    Mỗi từ vựng nằm gọn trong 2 trang: <strong>Trang 1 Từ & Nghĩa</strong> • <strong>Trang 2 có 3 Ví Dụ IELTS</strong>
+                  </p>
+                </div>
+              </div>
+
+              <button
+                id="hero-start-study-btn"
+                onClick={() => setIsStudyModeOpen(true)}
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer shrink-0"
+              >
+                <Play className="w-4 h-4 fill-slate-950 text-slate-950" />
+                <span>Bắt Đầu Vào Học</span>
+              </button>
+            </div>
+
             {/* Top Toolbar & Filter Tabs */}
-            <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
               
               {/* Search Field */}
               <div className="relative flex-1">
@@ -557,7 +640,7 @@ export default function App() {
                   title="Bật/Tắt chế độ đọc tập trung (ẩn thanh bên & footer)"
                 >
                   {isFocusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5 text-indigo-700" />}
-                  <span>{isFocusMode ? 'Đang Focus' : 'Focus Mode'}</span>
+                  <span>{isFocusMode ? 'Đang Focus' : 'Focus'}</span>
                 </button>
               </div>
 
@@ -594,7 +677,7 @@ export default function App() {
                 </button>
               </motion.div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <AnimatePresence mode="popLayout">
                   {displayWords.map((item, index) => (
                     <WordCard
@@ -615,17 +698,17 @@ export default function App() {
 
             {/* Pedagogical Note at Bottom (only when not in focus mode) */}
             {!isFocusMode && (
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-xs">
+              <div className="bg-white rounded-2xl border-2 border-slate-200 p-5 sm:p-6 shadow-xs">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 shrink-0 mt-0.5">
                     <GraduationCap className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
-                      Phương pháp Duy trì Chuỗi Ngày & Mở Khóa Huy Hiệu (Gamified Spaced Repetition)
+                      Tự Động Cập Nhật 10 Từ Mỗi Ngày (12:00 AM Reset)
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                      Hệ thống số hóa thành tích ghi nhận tiến trình học tập liên tục của bạn: từ chuỗi <strong>7-Day Streak</strong>, thành thạo <strong>100 Words Mastered</strong>, đến việc đạt điểm tuyệt đối <strong>Quiz Ace</strong>. Hãy tiếp tục duy trì việc ôn tập và học 10 từ mỗi ngày!
+                      Mỗi ngày vào lúc <strong>12:00 AM (00:00:00)</strong>, hệ thống tự động đổi sang 10 từ vựng C1/C2 học thuật mới và câu danh ngôn của ngày hôm đó, giúp bạn duy trì chuỗi học liên tục mà không cần thao tác tải lại trang thủ công.
                     </p>
                   </div>
                 </div>
@@ -639,13 +722,25 @@ export default function App() {
 
       {/* Footer (Hidden in Focus Mode) */}
       {!isFocusMode && (
-        <footer className="border-t-2 border-slate-200 bg-white py-4 text-xs text-slate-500 font-semibold tracking-wide mt-12">
+        <footer className="border-t-2 border-slate-200 bg-white py-4 text-xs text-slate-500 font-semibold tracking-wide mt-8 sm:mt-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 uppercase">
             <span>Advanced ESL Mastery Program • CEFR C1/C2 • IELTS 7.0–8.5</span>
-            <span>Words of the Day • Focus Mode & Achievements Edition</span>
+            <span>Words of the Day • 12:00 AM Auto-Refresh Edition</span>
           </div>
         </footer>
       )}
+
+      {/* DEDICATED MOBILE & DESKTOP 2-PAGE STUDY MODE MODAL */}
+      <StudyModeModal
+        isOpen={isStudyModeOpen}
+        onClose={() => setIsStudyModeOpen(false)}
+        words={currentWords}
+        learnedWordIds={learnedWordIds}
+        savedWordIds={savedWordIds}
+        onToggleLearned={handleToggleLearned}
+        onToggleSave={handleToggleSave}
+        onShowToast={showToast}
+      />
 
       {/* Interactive Practice Quiz & Flashcard Modal */}
       <PracticeModal
