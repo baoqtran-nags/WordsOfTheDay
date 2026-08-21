@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Star, Zap, WifiOff, CheckCircle2 } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 
 export type FontSizeMode = 'standard' | 'large' | 'xlarge';
@@ -17,6 +17,10 @@ interface HeaderProps {
   activeCount: number;
   fontSizeMode: FontSizeMode;
   onToggleFontSize: () => void;
+  todayStars: number;
+  totalStars: number;
+  onOpenStarReviewHub: () => void;
+  isOnline?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,7 +35,11 @@ export const Header: React.FC<HeaderProps> = ({
   showSavedOnly,
   activeCount,
   fontSizeMode,
-  onToggleFontSize
+  onToggleFontSize,
+  todayStars,
+  totalStars,
+  onOpenStarReviewHub,
+  isOnline = true,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -58,6 +66,17 @@ export const Header: React.FC<HeaderProps> = ({
                   <Sparkles className="w-3.5 h-3.5 mr-1 text-indigo-700" />
                   C1 / Advanced
                 </span>
+                {!isOnline ? (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+                    <WifiOff className="w-3.5 h-3.5 text-amber-700" />
+                    Offline Mode (Cached)
+                  </span>
+                ) : (
+                  <span className="hidden xl:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    Offline Ready
+                  </span>
+                )}
                 <span className="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
                   IELTS 6.5–8.0 • VSTEP C1
                 </span>
@@ -80,6 +99,24 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Action Buttons with comfortable Elder-Friendly Touch Targets */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
             
+            {/* Star Points & 2x Review Multiplier Hub Widget */}
+            <button
+              id="header-star-points-btn"
+              onClick={onOpenStarReviewHub}
+              className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs sm:text-sm font-black rounded-xl border-2 bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 text-amber-950 border-amber-300 transition-all shadow-xs cursor-pointer active:scale-95 group"
+              title="Daily Learning Stars & Voluntary 2x Review (12:00 AM – 11:59 PM)"
+            >
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-400 group-hover:scale-110 transition-transform" />
+                <span className="font-extrabold">{todayStars} ⭐</span>
+              </div>
+              <span className="text-amber-400 font-bold">•</span>
+              <span className="text-[11px] font-black px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 flex items-center gap-0.5">
+                <Zap className="w-3 h-3 fill-slate-950" />
+                2x Boost
+              </span>
+            </button>
+
             {/* Font Size Adjuster */}
             <button
               id="header-fontsize-btn"
@@ -138,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-indigo-600 rounded-xl bg-indigo-600 text-xs sm:text-sm font-bold text-white hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-60 cursor-pointer"
             >
               <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>New 5 Words</span>
+              <span>New 10 Words</span>
             </button>
           </div>
         </div>

@@ -9,17 +9,33 @@ import { ReviewModeModal } from './components/ReviewModeModal';
 import { GlossaryDrawer } from './components/GlossaryDrawer';
 import { WordOfTheHour } from './components/WordOfTheHour';
 import { StudyModeModal } from './components/StudyModeModal';
+import { FloatingStudyButton } from './components/FloatingStudyButton';
+import { DoubleStarReviewModal } from './components/DoubleStarReviewModal';
+import { DailyStarReviewHubModal } from './components/DailyStarReviewHubModal';
 import { Toast, ToastMessage } from './components/Toast';
-import { FontSizeMode } from './components/Header';
+import { FontSizeMode, Header } from './components/Header';
 import { loadStreakData, recordDailyCompletion, getLocalDateString } from './utils/streak';
 import { triggerStreakCelebrationConfetti } from './utils/confetti';
 import { loadLearnedWordsMeta, saveWordLearnedMeta, getWordsDueForReview } from './utils/reviewRetention';
 import { evaluateAchievements, loadAchievements, UserStats } from './utils/achievements';
 import {
+  loadStarData,
+  awardBaseWordStars,
+  awardDoubleBonusStars,
+  revokeWordStars,
+  StarSystemData,
+} from './utils/starSystem';
+import {
   getDailyWordsForDate,
   getDailyQuoteForDate,
   getMillisecondsUntilMidnight,
 } from './utils/dailyWordGenerator';
+import {
+  cacheDailyWords,
+  getCachedDailyWords,
+  cacheDailyQuote,
+  getCachedDailyQuote,
+} from './utils/offlineStorage';
 import {
   GraduationCap,
   Bookmark,
@@ -38,16 +54,21 @@ import {
   Play,
   Calendar,
   Layers,
+  Shuffle,
+  WifiOff,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
   const [currentDateStr, setCurrentDateStr] = useState<string>(() => getLocalDateString());
   const [currentWords, setCurrentWords] = useState<WordItem[]>(() =>
-    getDailyWordsForDate(getLocalDateString(), 'All')
+    getCachedDailyWords(getLocalDateString(), 'All')
   );
   const [currentQuote, setCurrentQuote] = useState<QuoteItem>(() =>
-    getDailyQuoteForDate(getLocalDateString())
+    getCachedDailyQuote(getLocalDateString())
+  );
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
   );
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
@@ -117,6 +138,11 @@ export default function App() {
     loadAchievements()
   );
 
+  // Star Points and 2x Multiplier System (12:00 AM - 11:59 PM Daily)
+  const [starData, setStarData] = useState<StarSystemData>(() => loadStarData());
+  const [activeDoubleReviewWord, setActiveDoubleReviewWord] = useState<WordItem | null>(null);
+  const [isDailyStarHubOpen, setIsDailyStarHubOpen] = useState<boolean>(false);
+
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isPracticeOpen, setIsPracticeOpen] = useState<boolean>(false);
   const [isReviewOpen, setIsReviewOpen] = useState<boolean>(false);
@@ -140,11 +166,12 @@ export default function App() {
     setCurrentQuote(newDailyQuote);
     setGenerationKey((k) => k + 1);
 
-    // Refresh streak data to reflect new day
+    // Refresh streak data & star points to reflect new day
     setStreakData(loadStreakData());
+    setStarData(loadStarData());
 
     showToast(
-      `✨ 12:00 AM: Đã tự động cập nhật 10 từ vựng của ngày mới (${newDateStr})!`,
+      `✨ 12:00 AM: Automatically updated today's 10 vocabulary words (${newDateStr})! Star counter reset for the new day.`,
       'success'
     );
   }, [selectedIndustry, showToast]);
@@ -171,12 +198,46 @@ export default function App() {
     };
   }, [currentDateStr, handleMidnightRefresh]);
 
+  // Network connectivity listener for offline mode
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      showToast('🟢 Back Online: All daily vocabulary synced.', 'success');
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      showToast('⚡ Offline Mode: Today’s 10 words & study modes cached locally.', 'info');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [showToast]);
+
+  // Synchronize active 10 daily words with localStorage cache
+  useEffect(() => {
+    if (currentWords.length > 0) {
+      cacheDailyWords(currentDateStr, selectedIndustry, currentWords);
+    }
+  }, [currentDateStr, selectedIndustry, currentWords]);
+
+  // Synchronize daily quote with localStorage cache
+  useEffect(() => {
+    if (currentQuote) {
+      cacheDailyQuote(currentDateStr, currentQuote);
+    }
+  }, [currentDateStr, currentQuote]);
+
   // Keyboard shortcut listener: ESC exits Focus Mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isFocusMode) {
         setIsFocusMode(false);
-        showToast('Đã thoát Chế độ Tập trung', 'info');
+        showToast('Exited Focus Mode', 'info');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -187,9 +248,9 @@ export default function App() {
     setIsFocusMode((prev) => {
       const next = !prev;
       if (next) {
-        showToast('Đã bật Chế độ Tập trung (Focus Mode) • Nhấn ESC để thoát', 'success');
+        showToast('Focus Mode enabled • Press ESC to exit', 'success');
       } else {
-        showToast('Đã thoát Chế độ Tập trung', 'info');
+        showToast('Exited Focus Mode', 'info');
       }
       return next;
     });
@@ -219,7 +280,7 @@ export default function App() {
   useEffect(() => {
     if (newlyUnlocked.length > 0) {
       newlyUnlocked.forEach((badge) => {
-        showToast(`🏆 HUY HIỆU MỚI: Mở khóa "${badge.title}"! ${badge.description}`, 'success');
+        showToast(`🏆 NEW BADGE: Unlocked "${badge.title}"! ${badge.description}`, 'success');
       });
       triggerStreakCelebrationConfetti();
       setUnlockedMap((prev) => {
@@ -239,7 +300,7 @@ export default function App() {
         localStorage.setItem('wotd_font_size', next);
       } catch (e) {}
       showToast(
-        `Cỡ chữ: ${next === 'xlarge' ? 'Rất lớn (Extra Large)' : next === 'large' ? 'Lớn (Elder-Friendly)' : 'Tiêu chuẩn'}`,
+        `Font size: ${next === 'xlarge' ? 'Extra Large' : next === 'large' ? 'Large (Elder-Friendly)' : 'Standard'}`,
         'info'
       );
       return next;
@@ -275,7 +336,7 @@ export default function App() {
         const { updatedData, isNewCompletionToday } = recordDailyCompletion(prev);
         if (isNewCompletionToday) {
           showToast(
-            `🔥 CHÚC MỪNG! Bạn đã hoàn thành 10 từ và đạt chuỗi ${updatedData.currentStreak} ngày liên tục!`,
+            `🔥 CONGRATULATIONS! You completed all 10 words and reached a ${updatedData.currentStreak}-day streak!`,
             'success'
           );
         }
@@ -310,7 +371,7 @@ export default function App() {
       setCurrentQuote(randomQuote);
 
       setIsRefreshing(false);
-      showToast('Đã tạo 10 thẻ từ vựng minh họa mới của ngày', 'success');
+      showToast('Generated 10 new illustrated vocabulary cards for today', 'success');
     }, 250);
   }, [showToast]);
 
@@ -320,14 +381,28 @@ export default function App() {
     generateNewSet(industry);
   };
 
+  const handleShuffleCurrentSet = () => {
+    if (currentWords.length <= 1) return;
+    setCurrentWords((prev) => {
+      const shuffled = [...prev];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    });
+    setGenerationKey((k) => k + 1);
+    showToast('🔀 Shuffled current 10-word order', 'info');
+  };
+
   const handleToggleSave = (id: string) => {
     setSavedWordIds((prev) => {
       const exists = prev.includes(id);
       if (exists) {
-        showToast('Đã xóa khỏi danh sách lưu', 'info');
+        showToast('Removed from saved vocabulary', 'info');
         return prev.filter((item) => item !== id);
       } else {
-        showToast('Đã lưu từ vựng vào kho lưu trữ', 'success');
+        showToast('Saved word to personal glossary', 'success');
         return [...prev, id];
       }
     });
@@ -338,20 +413,39 @@ export default function App() {
       const exists = prev.includes(id);
       let updated: string[];
       if (exists) {
-        showToast('Đã chuyển về trạng thái chưa học', 'info');
+        showToast('Marked as unlearned', 'info');
         updated = prev.filter((item) => item !== id);
         setLearnedMeta((currMeta) => saveWordLearnedMeta(id, false, currMeta));
+        // Revoke stars if previously awarded
+        revokeWordStars(id);
+        setStarData(loadStarData());
       } else {
         const item = VOCABULARY_DATABASE.find(w => w.id === id);
-        showToast(`Tuyệt vời! Đã xác nhận học xong "${item?.word || 'từ này'}"`, 'success');
+        showToast(`Mastered "${item?.word || 'this word'}"! (+10 ⭐ Stars Earned)`, 'success');
         updated = [...prev, id];
         setLearnedMeta((currMeta) => saveWordLearnedMeta(id, true, currMeta));
+        
+        // Award base +10 stars
+        const updatedStarData = awardBaseWordStars(id);
+        setStarData(updatedStarData);
+
+        // Prompt voluntary Double Star review challenge (12:00 AM - 11:59 PM)
+        if (item) {
+          setActiveDoubleReviewWord(item);
+        }
       }
 
       // Check if all 10 words in current set are completed
       checkAndRecordStreak(updated, currentWords);
       return updated;
     });
+  };
+
+  const handleCompleteDoubleStar = (wordId: string) => {
+    const updated = awardDoubleBonusStars(wordId);
+    setStarData(updated);
+    triggerStreakCelebrationConfetti();
+    showToast('🎉 2X MULTIPLIER UNLOCKED! +20 Stars Added to Today’s Total! ⭐⭐', 'success');
   };
 
   const handleMarkAllLearned = () => {
@@ -364,18 +458,22 @@ export default function App() {
       let nextMeta = { ...currMeta };
       currentIds.forEach((id) => {
         nextMeta = saveWordLearnedMeta(id, true, nextMeta);
+        awardBaseWordStars(id);
       });
       return nextMeta;
     });
 
+    setStarData(loadStarData());
     checkAndRecordStreak(updated, currentWords);
-    showToast('🎉 Xuất sắc! Đã đánh dấu hoàn thành toàn bộ 10 từ hôm nay!', 'success');
+    showToast('🎉 Excellent! Marked all 10 words as mastered today (+100 ⭐ base stars)!', 'success');
   };
 
   const handleResetLearnedCurrentSet = () => {
     const currentIds = currentWords.map((w) => w.id);
     setLearnedWordIds((prev) => prev.filter((id) => !currentIds.includes(id)));
-    showToast('Đã đặt lại tiến độ học của 10 từ hôm nay', 'info');
+    currentIds.forEach((id) => revokeWordStars(id));
+    setStarData(loadStarData());
+    showToast("Reset today's 10-word learning progress & stars", 'info');
   };
 
   const handleQuizComplete = (score: number, total: number) => {
@@ -467,19 +565,19 @@ export default function App() {
                 Focus Mode Active
               </span>
               <span className="text-xs sm:text-sm text-indigo-200 font-semibold hidden sm:inline">
-                Đọc tập trung không xao nhãng • Nhấn ESC để quay lại
+                Distraction-free reading • Press ESC to exit
               </span>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-300 mr-1">
-                Tiến độ: <strong className="text-white">{learnedCountInCurrentSet}/{currentWords.length}</strong>
+                Progress: <strong className="text-white">{learnedCountInCurrentSet}/{currentWords.length}</strong>
               </span>
 
               <button
                 onClick={handleToggleFontSize}
                 className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold flex items-center gap-1 cursor-pointer"
-                title="Thay đổi cỡ chữ"
+                title="Change font size"
               >
                 <Type className="w-4 h-4" />
               </button>
@@ -490,7 +588,7 @@ export default function App() {
                 className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-sm cursor-pointer transition-colors"
               >
                 <Minimize2 className="w-4 h-4 text-indigo-600" />
-                <span>Thoát Focus Mode</span>
+                <span>Exit Focus Mode</span>
               </button>
             </div>
           </div>
@@ -534,6 +632,10 @@ export default function App() {
                 streakData={streakData}
                 badges={badges}
                 learnedMeta={learnedMeta}
+                todayStars={starData.todayStars}
+                totalStars={starData.totalStars}
+                onOpenStarReviewHub={() => setIsDailyStarHubOpen(true)}
+                isOnline={isOnline}
               />
             </div>
           )}
@@ -541,7 +643,29 @@ export default function App() {
           {/* Right Column: Scrollable Feed of 10 Word Cards */}
           <main className={`w-full min-w-0 space-y-4 sm:space-y-6 ${isFocusMode ? 'max-w-3xl mx-auto' : 'flex-1'}`}>
             
-            {/* PRIMARY "VÀO HỌC NGAY" HERO BANNER (Distraction-Free 2-Page Mobile/Desktop Flashcard Experience) */}
+            {/* Offline Notification Banner */}
+            {!isOnline && (
+              <div className="bg-amber-50 border-2 border-amber-300 text-amber-950 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-200 flex items-center justify-center text-amber-900 shrink-0">
+                    <WifiOff className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm sm:text-base font-extrabold text-amber-950">
+                      Offline Mode Active
+                    </h3>
+                    <p className="text-xs text-amber-800 font-medium">
+                      All 10 daily words, pronunciations, flashcard study modes, and quizzes are stored locally in your browser cache and remain 100% functional offline.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-black px-2.5 py-1 rounded-full bg-amber-200 text-amber-950 border border-amber-300 shrink-0 hidden sm:inline-block">
+                  Cached & Ready
+                </span>
+              </div>
+            )}
+
+            {/* PRIMARY "START STUDYING" HERO BANNER (Distraction-Free 2-Page Mobile/Desktop Flashcard Experience) */}
             <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border-2 border-indigo-700 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3.5 text-center sm:text-left">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-600/50 shrink-0">
@@ -550,14 +674,14 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2 justify-center sm:justify-start">
                     <span className="text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/50 text-indigo-200 border border-indigo-400/40">
-                      Chế Độ Học Tối Ưu Cho Điện Thoại
+                      Mobile-Optimized Study Mode
                     </span>
                   </div>
                   <h2 className="text-lg sm:text-xl font-black text-white mt-1 tracking-tight">
-                    Vào Học 10 Từ Hôm Nay (1-2 Trang Chuẩn Di Động)
+                    Study Today's 10 Words (2-Page Mobile Format)
                   </h2>
                   <p className="text-xs sm:text-sm text-indigo-200 font-medium">
-                    Mỗi từ vựng nằm gọn trong 2 trang: <strong>Trang 1 Từ & Nghĩa</strong> • <strong>Trang 2 có 3 Ví Dụ IELTS</strong>
+                    Each card fits cleanly into 2 pages: <strong>Page 1: Word & Definition</strong> • <strong>Page 2: 3 IELTS Examples</strong>
                   </p>
                 </div>
               </div>
@@ -568,7 +692,7 @@ export default function App() {
                 className="w-full sm:w-auto px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 cursor-pointer shrink-0"
               >
                 <Play className="w-4 h-4 fill-slate-950 text-slate-950" />
-                <span>Bắt Đầu Vào Học</span>
+                <span>Start Study Mode</span>
               </button>
             </div>
 
@@ -582,7 +706,7 @@ export default function App() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Tra cứu từ vựng, định nghĩa hoặc từ gốc Latin..."
+                  placeholder="Search vocabulary, definition, etymology, or industry..."
                   className="w-full pl-9 pr-4 py-2 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:border-indigo-600 transition-colors"
                 />
                 {searchQuery && (
@@ -605,7 +729,7 @@ export default function App() {
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  Tất cả ({currentWords.length})
+                  All ({currentWords.length})
                 </button>
                 <button
                   onClick={() => setViewFilter('unlearned')}
@@ -615,7 +739,7 @@ export default function App() {
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  Chưa học ({currentWords.length - learnedCountInCurrentSet})
+                  Unlearned ({currentWords.length - learnedCountInCurrentSet})
                 </button>
                 <button
                   onClick={() => setViewFilter('learned')}
@@ -625,7 +749,18 @@ export default function App() {
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  Đã học ({learnedCountInCurrentSet})
+                  Mastered ({learnedCountInCurrentSet})
+                </button>
+
+                {/* Shuffle Button */}
+                <button
+                  id="shuffle-current-set-btn"
+                  onClick={handleShuffleCurrentSet}
+                  className="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all whitespace-nowrap cursor-pointer border-2 bg-indigo-50 text-indigo-900 border-indigo-300 hover:bg-indigo-100 flex items-center gap-1.5 shadow-2xs active:scale-95"
+                  title="Re-randomize the order of the current 10-word set"
+                >
+                  <Shuffle className="w-3.5 h-3.5 text-indigo-700" />
+                  <span>Shuffle</span>
                 </button>
 
                 {/* Focus Mode Toggle Button */}
@@ -637,10 +772,10 @@ export default function App() {
                       ? 'bg-indigo-950 text-amber-300 border-indigo-900'
                       : 'bg-indigo-50 text-indigo-900 border-indigo-300 hover:bg-indigo-100'
                   }`}
-                  title="Bật/Tắt chế độ đọc tập trung (ẩn thanh bên & footer)"
+                  title="Toggle distraction-free focus mode"
                 >
                   {isFocusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5 text-indigo-700" />}
-                  <span>{isFocusMode ? 'Đang Focus' : 'Focus'}</span>
+                  <span>{isFocusMode ? 'Focusing' : 'Focus'}</span>
                 </button>
               </div>
 
@@ -655,10 +790,10 @@ export default function App() {
               >
                 <Award className="w-12 h-12 text-indigo-300 mx-auto mb-3" />
                 <h3 className="text-xl font-bold text-slate-900 mb-1">
-                  Không tìm thấy từ vựng phù hợp
+                  No matching vocabulary found
                 </h3>
                 <p className="text-sm text-slate-500 mb-5">
-                  Hãy thử thay đổi bộ lọc trạng thái hoặc từ khóa tìm kiếm.
+                  Try clearing your search query or switching status filters.
                 </p>
                 <button
                   onClick={() => {
@@ -667,13 +802,13 @@ export default function App() {
                   }}
                   className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-sm font-bold text-white rounded-xl transition-colors shadow-md cursor-pointer mr-3"
                 >
-                  Xem Tất cả 10 từ
+                  View All 10 Words
                 </button>
                 <button
                   onClick={() => setIsPracticeOpen(true)}
                   className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-sm font-bold text-white rounded-xl transition-colors shadow-md cursor-pointer"
                 >
-                  Luyện tập Quiz
+                  Practice Quiz
                 </button>
               </motion.div>
             ) : (
@@ -690,6 +825,8 @@ export default function App() {
                       onToggleLearned={handleToggleLearned}
                       onShowToast={showToast}
                       totalWordsInSet={displayWords.length}
+                      starRecord={starData.wordRecords[item.id]}
+                      onOpenDoubleReview={(word) => setActiveDoubleReviewWord(word)}
                     />
                   ))}
                 </AnimatePresence>
@@ -705,10 +842,10 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1">
-                      Tự Động Cập Nhật 10 Từ Mỗi Ngày (12:00 AM Reset)
+                      Automated Daily Vocabulary Rotation (12:00 AM Reset)
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                      Mỗi ngày vào lúc <strong>12:00 AM (00:00:00)</strong>, hệ thống tự động đổi sang 10 từ vựng C1/C2 học thuật mới và câu danh ngôn của ngày hôm đó, giúp bạn duy trì chuỗi học liên tục mà không cần thao tác tải lại trang thủ công.
+                      Every day at <strong>12:00 AM (00:00:00)</strong>, the system automatically cycles to 10 new advanced C1/C2 academic vocabulary items and a daily thought leadership quote, helping you maintain consistent daily progress seamlessly.
                     </p>
                   </div>
                 </div>
@@ -730,6 +867,14 @@ export default function App() {
         </footer>
       )}
 
+      {/* Floating Back to Study Mode Action Button (appears on scroll down) */}
+      <FloatingStudyButton
+        onOpenStudyMode={() => setIsStudyModeOpen(true)}
+        learnedCount={learnedCountInCurrentSet}
+        totalWords={currentWords.length}
+        isStudyModeOpen={isStudyModeOpen}
+      />
+
       {/* DEDICATED MOBILE & DESKTOP 2-PAGE STUDY MODE MODAL */}
       <StudyModeModal
         isOpen={isStudyModeOpen}
@@ -739,6 +884,29 @@ export default function App() {
         savedWordIds={savedWordIds}
         onToggleLearned={handleToggleLearned}
         onToggleSave={handleToggleSave}
+        onShowToast={showToast}
+        starData={starData}
+        onOpenDoubleReview={(word) => setActiveDoubleReviewWord(word)}
+      />
+
+      {/* Voluntary Double Star Review Modal for individual words */}
+      <DoubleStarReviewModal
+        isOpen={activeDoubleReviewWord !== null}
+        onClose={() => setActiveDoubleReviewWord(null)}
+        word={activeDoubleReviewWord}
+        onCompleteDouble={handleCompleteDoubleStar}
+        onShowToast={showToast}
+      />
+
+      {/* Daily Star Points & Voluntary Batch Review Hub Modal */}
+      <DailyStarReviewHubModal
+        isOpen={isDailyStarHubOpen}
+        onClose={() => setIsDailyStarHubOpen(false)}
+        starData={starData}
+        todayWords={currentWords}
+        learnedWordIds={learnedWordIds}
+        onOpenSingleWordReview={(word) => setActiveDoubleReviewWord(word)}
+        onCompleteDouble={handleCompleteDoubleStar}
         onShowToast={showToast}
       />
 

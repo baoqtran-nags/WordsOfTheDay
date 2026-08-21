@@ -38,7 +38,7 @@ export const WordOfTheHour: React.FC<WordOfTheHourProps> = ({
     setCurrentWord(random);
 
     if (isManual && onShowToast) {
-      onShowToast(`Từ vựng của giờ mới: "${random.word}"`, 'info');
+      onShowToast(`New Word of the Hour: "${random.word}"`, 'info');
     }
   };
 
@@ -60,7 +60,7 @@ export const WordOfTheHour: React.FC<WordOfTheHourProps> = ({
   const formatCountdown = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
-    return `${mins}p ${secs < 10 ? '0' : ''}${secs}s`;
+    return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
   };
 
   const handleListen = (e: React.MouseEvent) => {
@@ -89,7 +89,7 @@ export const WordOfTheHour: React.FC<WordOfTheHourProps> = ({
 
           <div className="flex items-center gap-1 text-slate-300 text-xs font-semibold">
             <Clock className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="hidden sm:inline">Đổi từ sau:</span>
+            <span className="hidden sm:inline">Next in:</span>
             <span className="font-mono text-amber-300 font-bold">{formatCountdown(secondsRemaining)}</span>
           </div>
         </div>
@@ -125,16 +125,16 @@ export const WordOfTheHour: React.FC<WordOfTheHourProps> = ({
                 ? 'bg-indigo-600 text-white border-indigo-400 ring-2 ring-indigo-300'
                 : 'bg-slate-800/80 hover:bg-slate-700 text-indigo-200 border-slate-700'
             }`}
-            title="Nghe phát âm từ của giờ này (Web Speech API)"
+            title="Listen to Word of the Hour pronunciation"
           >
             <Volume2 className={`w-3.5 h-3.5 ${isPlayingAudio ? 'animate-bounce text-white' : ''}`} />
-            <span className="hidden lg:inline text-[11px]">Nghe phát âm</span>
+            <span className="hidden lg:inline text-[11px]">Pronounce</span>
           </button>
 
           <button
             onClick={() => pickNewWord(true)}
             className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
-            title="Đổi sang từ vựng khác ngay lập tức"
+            title="Switch to another word"
           >
             <Shuffle className="w-3.5 h-3.5" />
           </button>

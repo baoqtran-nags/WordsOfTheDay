@@ -43,7 +43,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
 
   const handleStartQuiz = () => {
     if (candidates.length === 0) {
-      onShowToast('Hiện tại chưa có từ vựng nào học quá 3 ngày cần ôn tập.', 'info');
+      onShowToast('There are currently no words learned 3+ days ago due for review.', 'info');
       return;
     }
     setStep('quiz');
@@ -120,11 +120,11 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                   Review Mode (Spaced Repetition)
                 </h2>
                 <span className="text-xs font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-900 border border-indigo-200">
-                  3+ Ngày
+                  3+ Days
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                Củng cố trí nhớ dài hạn theo đường cong lãng quên (Ebbinghaus Forgetting Curve)
+                Strengthen long-term memory retention based on the Ebbinghaus Forgetting Curve
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Đóng cửa sổ"
+            title="Close window"
           >
             <X className="w-6 h-6" />
           </button>
@@ -145,10 +145,10 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
               <Sparkles className="w-6 h-6 text-indigo-700 shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-extrabold text-indigo-950 text-sm sm:text-base">
-                  Mục tiêu Ôn Tập Dài Hạn ({candidates.length} từ đến hạn ôn tập)
+                  Long-term Retention Goal ({candidates.length} words due for review)
                 </h3>
                 <p className="text-xs sm:text-sm text-indigo-900 leading-relaxed mt-1">
-                  Đây là những từ vựng bạn đã xác nhận học từ <strong>3 ngày trước trở lên</strong>. Việc làm mini-quiz ôn tập này giúp chuyển hóa từ vựng ngắn hạn thành vốn từ phản xạ dài hạn cho IELTS Writing & Speaking.
+                  These are words you marked as learned <strong>3 or more days ago</strong>. Taking this spaced repetition mini-quiz reinforces active recall for IELTS Writing & Speaking.
                 </p>
               </div>
             </div>
@@ -156,15 +156,15 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
             {/* List of candidate words */}
             <div>
               <div className="flex items-center justify-between text-xs font-black text-slate-500 uppercase tracking-wider mb-2.5">
-                <span>Danh sách từ vựng cần ôn tập hôm nay ({candidates.length})</span>
-                <span>Thời gian đã học</span>
+                <span>Words due for review today ({candidates.length})</span>
+                <span>Time elapsed</span>
               </div>
 
               {candidates.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 text-slate-500">
                   <Clock className="w-8 h-8 mx-auto text-slate-400 mb-2" />
-                  <p className="font-bold text-slate-700">Chưa có từ vựng nào học quá 3 ngày!</p>
-                  <p className="text-xs mt-1">Hãy tiếp tục đánh dấu học từ hôm nay, hệ thống sẽ tự động nhắc nhở ôn tập sau 3 ngày.</p>
+                  <p className="font-bold text-slate-700">No words learned 3+ days ago yet!</p>
+                  <p className="text-xs mt-1">Keep learning new words today; the system will remind you to review after 3 days.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-64 overflow-y-auto pr-1">
@@ -186,7 +186,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                       <div className="text-right shrink-0">
                         <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md">
                           <Clock className="w-3 h-3 text-amber-700" />
-                          {c.daysSinceLearned} ngày trước
+                          {c.daysSinceLearned} {c.daysSinceLearned === 1 ? 'day ago' : 'days ago'}
                         </span>
                       </div>
                     </div>
@@ -202,7 +202,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                 onClick={handleStartQuiz}
                 className="w-full py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Bắt đầu Mini-Quiz Ôn Tập ({candidates.length} câu hỏi)</span>
+                <span>Start Review Mini-Quiz ({candidates.length} questions)</span>
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
@@ -215,17 +215,17 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
             {/* Progress counter & score */}
             <div className="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-600">
               <span className="px-3 py-1 bg-slate-100 rounded-lg border border-slate-200">
-                Câu {currentIndex + 1} / {totalQuestions}
+                Question {currentIndex + 1} / {totalQuestions}
               </span>
               <span className="px-3 py-1 bg-indigo-50 text-indigo-900 rounded-lg border border-indigo-200 font-extrabold">
-                Điểm: {score} / {totalQuestions}
+                Score: {score} / {totalQuestions}
               </span>
             </div>
 
             {/* Question sentence */}
             <div className="p-5 sm:p-6 bg-slate-50 rounded-2xl border-2 border-slate-200">
               <span className="text-[11px] font-black text-indigo-700 uppercase tracking-wider block mb-2">
-                Hoàn thành câu ngữ cảnh chuẩn C1/C2:
+                Complete the academic context sentence:
               </span>
               <p className="text-base sm:text-lg text-slate-900 font-semibold leading-relaxed">
                 “{currentQ.sentenceWithBlank}”
@@ -274,17 +274,17 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black text-indigo-900 uppercase">Giải thích & Nguồn gốc:</span>
+                    <span className="text-xs font-black text-indigo-900 uppercase">Definition & Etymology:</span>
                     <button
                       onClick={() => handleListenWord(currentQ.correctAnswer)}
                       className="p-1 rounded-md bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-100 cursor-pointer"
-                      title="Nghe phát âm từ này"
+                      title="Listen to pronunciation"
                     >
                       <Volume2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <span className="text-xs font-extrabold text-indigo-800">
-                    Đáp án đúng: <strong>{currentQ.correctAnswer}</strong>
+                    Correct Answer: <strong>{currentQ.correctAnswer}</strong>
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-indigo-950 leading-relaxed">
@@ -300,7 +300,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                   onClick={handleNext}
                   className="py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm sm:text-base flex items-center gap-2 transition-all cursor-pointer shadow-md"
                 >
-                  <span>{isLastQuestion ? 'Xem kết quả ôn tập' : 'Câu tiếp theo'}</span>
+                  <span>{isLastQuestion ? 'View Review Summary' : 'Next Question'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               )}
@@ -317,27 +317,27 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
 
             <div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-['Plus_Jakarta_Sans',sans-serif]">
-                Hoàn thành Ôn Tập Dài Hạn!
+                Spaced Review Session Complete!
               </h3>
               <p className="text-sm text-slate-600 font-semibold mt-1">
-                Tỷ lệ ghi nhớ dài hạn (Retention Index): {Math.round((score / totalQuestions) * 100)}%
+                Long-Term Retention Index: {Math.round((score / totalQuestions) * 100)}%
               </p>
             </div>
 
             {/* Score cards */}
             <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
               <div className="p-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl">
-                <span className="text-xs font-bold text-emerald-800 uppercase block">Số câu đúng</span>
+                <span className="text-xs font-bold text-emerald-800 uppercase block">Correct Answers</span>
                 <span className="text-2xl sm:text-3xl font-black text-emerald-950">{score} / {totalQuestions}</span>
               </div>
               <div className="p-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl">
-                <span className="text-xs font-bold text-indigo-800 uppercase block">Số từ đã củng cố</span>
-                <span className="text-2xl sm:text-3xl font-black text-indigo-950">{candidates.length} từ</span>
+                <span className="text-xs font-bold text-indigo-800 uppercase block">Reinforced Words</span>
+                <span className="text-2xl sm:text-3xl font-black text-indigo-950">{candidates.length} {candidates.length === 1 ? 'word' : 'words'}</span>
               </div>
             </div>
 
             <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-              Tuyệt vời! Những từ vựng này đã được củng cố vào bộ nhớ phản xạ tự nhiên của bạn. Hãy tiếp tục duy trì chuỗi học hằng ngày!
+              Great job! These academic words have been solidified into your active recall memory. Keep up your daily streak!
             </p>
 
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -346,7 +346,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                 className="py-3 px-5 rounded-xl border-2 border-slate-300 bg-white hover:bg-slate-100 text-slate-800 font-bold text-sm flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                <span>Ôn tập lại</span>
+                <span>Review Again</span>
               </button>
 
               <button
@@ -354,7 +354,7 @@ export const ReviewModeModal: React.FC<ReviewModeModalProps> = ({
                 className="py-3 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm flex items-center gap-2 cursor-pointer shadow-md transition-colors"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Hoàn tất & Quay về</span>
+                <span>Done & Return</span>
               </button>
             </div>
           </div>

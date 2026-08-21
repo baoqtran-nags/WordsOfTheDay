@@ -32,7 +32,7 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
 }) => {
   const chartData: DayActivityData[] = useMemo(() => {
     const days: DayActivityData[] = [];
-    const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     // Map counts from learnedMeta
     const dateCounts: Record<string, number> = {};
@@ -51,7 +51,7 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const day = String(d.getDate()).padStart(2, '0');
       const dateString = `${year}-${month}-${day}`;
-      const dayLabel = i === 0 ? 'Hôm nay' : dayNames[d.getDay()];
+      const dayLabel = i === 0 ? 'Today' : dayNames[d.getDay()];
 
       let count = dateCounts[dateString] || 0;
       if (i === 0) {
@@ -86,14 +86,14 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
               Weekly Learning Activity
             </h3>
             <span className="text-[11px] text-slate-500 font-semibold block -mt-0.5">
-              Số từ đã học trong 7 ngày qua
+              Words mastered over the past 7 days
             </span>
           </div>
         </div>
 
         <div className="text-right">
           <span className="text-xs font-black text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
-            {totalWeeklyWords} từ / tuần
+            {totalWeeklyWords} words / week
           </span>
         </div>
       </div>
@@ -126,10 +126,10 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
                         {data.dayLabel} ({data.dateStr})
                       </p>
                       <p className="font-extrabold text-sm text-white mt-0.5">
-                        {data.count} / 10 từ đã học
+                        {data.count} / 10 words mastered
                       </p>
                       <p className="text-[10px] text-slate-400 mt-0.5">
-                        {data.count >= 10 ? '🎉 Đạt 100% mục tiêu ngày' : `Tiến độ: ${Math.round((data.count / 10) * 100)}%`}
+                        {data.count >= 10 ? '🎉 100% daily goal achieved' : `Progress: ${Math.round((data.count / 10) * 100)}%`}
                       </p>
                     </div>
                   );
@@ -167,13 +167,13 @@ export const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-500">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-sm bg-indigo-600 inline-block" />
-          <span>Hôm nay</span>
+          <span>Today</span>
           <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block ml-1.5" />
-          <span>Đạt 10 từ</span>
+          <span>10 words</span>
         </div>
         <div className="flex items-center gap-1 text-slate-700 font-extrabold">
           <TrendingUp className="w-3.5 h-3.5 text-indigo-600" />
-          <span>TB: {avgDaily} từ/ngày</span>
+          <span>Avg: {avgDaily} words/day</span>
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, CheckCircle2, Sparkles, RefreshCw, GraduationCap, Building2, MessageSquare, BookOpen } from 'lucide-react';
+import { Volume2, Copy, Check, Bookmark, Tag, ChevronDown, ChevronUp, History, CheckCircle2, Sparkles, RefreshCw, GraduationCap, Building2, MessageSquare, BookOpen, Star, Zap } from 'lucide-react';
 import { playPronunciation } from '../utils/speech';
 import { getThreeContextAwareExamples, fetchAlternativeAcademicScenarios, ContextScenario } from '../utils/academicExamples';
+import { WordStarRecord } from '../utils/starSystem';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface WordCardProps {
@@ -14,6 +15,8 @@ interface WordCardProps {
   onToggleLearned: (id: string) => void;
   onShowToast: (text: string, type: 'success' | 'info' | 'error') => void;
   totalWordsInSet?: number;
+  starRecord?: WordStarRecord;
+  onOpenDoubleReview?: (word: WordItem) => void;
 }
 
 export const WordCard: React.FC<WordCardProps> = ({
@@ -25,6 +28,8 @@ export const WordCard: React.FC<WordCardProps> = ({
   onToggleLearned,
   onShowToast,
   totalWordsInSet = 10,
+  starRecord,
+  onOpenDoubleReview,
 }) => {
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [playingSentenceIndex, setPlayingSentenceIndex] = useState<number | null>(null);
@@ -56,7 +61,7 @@ export const WordCard: React.FC<WordCardProps> = ({
         onEnd: () => setIsPlayingWord(false),
         onError: () => {
           setIsPlayingWord(false);
-          onShowToast('Web Speech API: Trình duyệt chưa hỗ trợ giọng đọc này', 'info');
+          onShowToast('Web Speech API: Voice not supported in this browser', 'info');
         }
       }
     );
@@ -83,7 +88,7 @@ export const WordCard: React.FC<WordCardProps> = ({
         onEnd: () => setPlayingSentenceIndex(null),
         onError: () => {
           setPlayingSentenceIndex(null);
-          onShowToast('Không thể phát âm câu này', 'info');
+          onShowToast('Unable to pronounce this sentence', 'info');
         }
       }
     );
@@ -97,7 +102,7 @@ export const WordCard: React.FC<WordCardProps> = ({
       setIsAlternativeMode((prev) => !prev);
       setIsFetchingAlt(false);
       onShowToast(
-        !isAlternativeMode ? 'Đã tải 3 ví dụ học thuật chuyên sâu mới (Band 8.5+)' : 'Đã quay lại 3 ví dụ chuẩn',
+        !isAlternativeMode ? 'Loaded 3 new advanced academic examples (Band 8.5+)' : 'Returned to standard examples',
         'info'
       );
     }, 200);
@@ -113,7 +118,7 @@ export const WordCard: React.FC<WordCardProps> = ({
     
     navigator.clipboard.writeText(formatted);
     setIsCopied(true);
-    onShowToast(`Đã sao chép từ và 3 ví dụ chuẩn IELTS của "${item.word}"!`, 'success');
+    onShowToast(`Copied word and 3 academic examples for "${item.word}"!`, 'success');
     setTimeout(() => setIsCopied(false), 2000);
   };
 
@@ -212,14 +217,14 @@ export const WordCard: React.FC<WordCardProps> = ({
   return (
     <motion.article
       id={`word-card-${item.id}`}
-      layout
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+      layout="position"
+      initial={{ opacity: 0, y: 35, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.96 }}
       transition={{
-        duration: 0.3,
-        delay: Math.min(index * 0.03, 0.2),
-        ease: 'easeOut',
+        duration: 0.45,
+        delay: Math.min(index * 0.05, 0.35),
+        ease: [0.22, 1, 0.36, 1],
       }}
       className={`snap-start scroll-mt-3 sm:scroll-mt-6 rounded-2xl border-2 shadow-md border-t-6 sm:border-t-8 ${theme.borderTop} p-4 sm:p-6 md:p-7 flex flex-col md:flex-row gap-4 sm:gap-6 hover:shadow-xl transition-all w-full relative overflow-hidden ${
         isLearned
@@ -228,58 +233,87 @@ export const WordCard: React.FC<WordCardProps> = ({
       }`}
     >
       {/* Mobile Index & Learned Indicator Bar */}
-      <div className="flex items-center justify-between gap-2 md:hidden pb-1 border-b border-slate-100">
+      <div className="flex items-center justify-between gap-2 md:hidden pb-1 border-b border-slate-100 flex-wrap">
         <span className="text-[11px] font-black text-indigo-900 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
-          Thẻ {index + 1} / {totalWordsInSet}
+          Card {index + 1} / {totalWordsInSet}
         </span>
 
         {isLearned ? (
-          <span className="flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            Đã thuộc
-          </span>
+          <div className="flex items-center gap-1.5">
+            {starRecord?.isDoubled ? (
+              <span className="inline-flex items-center gap-1 text-[11px] font-black text-amber-950 bg-amber-200 border border-amber-300 px-2 py-0.5 rounded-full">
+                <Star className="w-3 h-3 fill-amber-500 text-amber-600" />
+                20 ⭐ (2x)
+              </span>
+            ) : onOpenDoubleReview ? (
+              <button
+                onClick={() => onOpenDoubleReview(item)}
+                className="inline-flex items-center gap-1 text-[11px] font-black text-amber-950 bg-amber-300 hover:bg-amber-400 border border-amber-400 px-2 py-0.5 rounded-full transition-all cursor-pointer animate-pulse"
+                title="Voluntary Review: Double to 20 Stars (12:00 AM - 11:59 PM)"
+              >
+                <Zap className="w-3 h-3 fill-amber-900" />
+                10 ⭐ (Double x2)
+              </button>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">
+                10 ⭐
+              </span>
+            )}
+            <span className="flex items-center gap-1 text-[11px] font-black text-emerald-700 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Learned
+            </span>
+          </div>
         ) : (
-          <span className="text-[11px] font-semibold text-slate-400">
-            Chưa học
+          <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
+            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+            +10 Stars
           </span>
         )}
       </div>
 
-      {/* Desktop Learned Badge Indicator */}
-      {isLearned && (
-        <div className="hidden md:flex absolute top-4 right-4 z-10 items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-black shadow-sm">
-          <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>ĐÃ HỌC • LEARNED</span>
-        </div>
-      )}
+      {/* Desktop Top Right Badges: Learned & Star Multiplier */}
+      <div className="hidden md:flex absolute top-4 right-4 z-10 items-center gap-2">
+        {isLearned && (
+          <>
+            {starRecord?.isDoubled ? (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-400 text-slate-950 rounded-full text-xs font-black shadow-xs border border-amber-500">
+                <Star className="w-3.5 h-3.5 fill-slate-950" />
+                <span>20 STARS (2X BOOSTED)</span>
+              </div>
+            ) : onOpenDoubleReview ? (
+              <button
+                onClick={() => onOpenDoubleReview(item)}
+                className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-300 to-amber-400 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-full text-xs font-black shadow-xs border border-amber-500 cursor-pointer transition-all active:scale-95 animate-pulse"
+                title="Voluntary Review: Double to 20 Stars (12:00 AM - 11:59 PM)"
+              >
+                <Zap className="w-3.5 h-3.5 fill-slate-950" />
+                <span>10 ⭐ • DOUBLE TO 20 ⭐ (REVIEW)</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-950 rounded-full text-xs font-bold border border-amber-300">
+                <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600" />
+                <span>10 STARS</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-black shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>LEARNED</span>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Left Column: Visual Illustration & Core Identity */}
       <div className="w-full md:w-5/12 lg:w-4/12 shrink-0 flex flex-col justify-between">
         <div>
-          {/* Illustration Container - Snug on mobile phones */}
-          {item.imageUrl && !imgError && (
-            <div className="relative w-full h-36 sm:h-48 md:h-52 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-3 group/img shadow-2xs">
-              <img
-                src={item.imageUrl}
-                alt={item.word}
-                referrerPolicy="no-referrer"
-                onError={() => setImgError(true)}
-                className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-              <div className="absolute bottom-1.5 left-2.5 right-2.5 text-amber-200 text-[11px] sm:text-xs font-bold line-clamp-1 drop-shadow-md">
-                {item.imageCaption || `Metaphor: ${item.word}`}
-              </div>
-            </div>
-          )}
-
           {/* Word Heading + Speaker Pronunciation Button */}
           <div className="flex items-center justify-between gap-2">
             <h3 
               onClick={() => handleListenWord()}
               className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans',sans-serif] hover:text-indigo-600 transition-colors cursor-pointer break-words"
-              title="Click để nghe phát âm từ vựng (Web Speech API)"
+              title="Click to hear word pronunciation (Web Speech API)"
             >
               {item.word}
             </h3>
@@ -295,7 +329,7 @@ export const WordCard: React.FC<WordCardProps> = ({
                   ? 'bg-indigo-600 text-white border-indigo-700 shadow-md ring-2 ring-indigo-300 scale-105'
                   : 'text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border-indigo-200 hover:shadow-xs active:scale-95'
               }`}
-              title="Nghe phát âm chuẩn (Web Speech API)"
+              title="Listen to pronunciation (Web Speech API)"
             >
               <Volume2 className={`w-5 h-5 ${isPlayingWord ? 'animate-pulse' : ''}`} />
             </button>
@@ -312,7 +346,7 @@ export const WordCard: React.FC<WordCardProps> = ({
           </div>
 
           {/* Chips & Tags - With nowrap to prevent tag breakage */}
-          <div className="flex items-center gap-1.5 sm:gap-2 mt-2 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 mt-2 mb-3 flex-wrap">
             <span className={`text-[11px] sm:text-xs font-black uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md border whitespace-nowrap ${theme.badgeBg}`}>
               {item.industry}
             </span>
@@ -323,12 +357,30 @@ export const WordCard: React.FC<WordCardProps> = ({
               {item.level}
             </span>
           </div>
+
+          {/* Illustration Container - Placed below word & identity */}
+          {item.imageUrl && !imgError && (
+            <div className="relative w-full h-36 sm:h-44 md:h-48 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-2 group/img shadow-2xs">
+              <img
+                src={item.imageUrl}
+                alt={item.word}
+                referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
+                className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
+              <div className="absolute bottom-1.5 left-2.5 right-2.5 text-amber-200 text-[11px] sm:text-xs font-bold line-clamp-1 drop-shadow-md">
+                {item.imageCaption || `Metaphor: ${item.word}`}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Action Buttons: Mark as Learned + Save + Copy (44px min touch target) */}
         <div className="flex flex-col gap-2 mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-200/80">
           
-          {/* Primary "Đã học / Mark as Learned" Button */}
+          {/* Primary "Mark as Learned" Button */}
           <button
             id={`btn-learned-${item.id}`}
             onClick={() => onToggleLearned(item.id)}
@@ -337,10 +389,10 @@ export const WordCard: React.FC<WordCardProps> = ({
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700'
                 : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300'
             }`}
-            title={isLearned ? 'Bỏ đánh dấu đã học' : 'Xác nhận đã thuộc từ này'}
+            title={isLearned ? 'Unmark as learned' : 'Mark word as learned'}
           >
             <CheckCircle2 className={`w-4 h-4 ${isLearned ? 'text-white' : 'text-emerald-700'}`} />
-            <span>{isLearned ? '✓ Đã thuộc từ này' : 'Xác nhận đã học'}</span>
+            <span>{isLearned ? '✓ Learned' : 'Mark as Learned'}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -354,7 +406,7 @@ export const WordCard: React.FC<WordCardProps> = ({
               }`}
             >
               <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-amber-600 text-amber-600' : ''}`} />
-              <span>{isSaved ? 'Đã lưu' : 'Lưu'}</span>
+              <span>{isSaved ? 'Saved' : 'Save'}</span>
             </button>
 
             <button
@@ -364,7 +416,7 @@ export const WordCard: React.FC<WordCardProps> = ({
               title="Copy Word Details & 3 IELTS Examples"
             >
               {isCopied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-500" />}
-              <span>{isCopied ? 'Đã chép' : 'Sao chép'}</span>
+              <span>{isCopied ? 'Copied' : 'Copy'}</span>
             </button>
           </div>
         </div>
@@ -440,10 +492,10 @@ export const WordCard: React.FC<WordCardProps> = ({
                 onClick={handleToggleAltExamples}
                 disabled={isFetchingAlt}
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded-lg transition-colors cursor-pointer ml-auto"
-                title="Tạo các ngữ cảnh học thuật thay thế khác"
+                title="Generate alternative academic contexts"
               >
                 <RefreshCw className={`w-3 h-3 ${isFetchingAlt ? 'animate-spin' : ''}`} />
-                <span>{isAlternativeMode ? 'Ví dụ chuẩn' : 'Mở rộng'}</span>
+                <span>{isAlternativeMode ? 'Standard' : 'Alternative'}</span>
               </button>
             </div>
 
@@ -476,7 +528,7 @@ export const WordCard: React.FC<WordCardProps> = ({
                             ? 'bg-indigo-600 text-white border-indigo-700 shadow-xs ring-1 ring-indigo-300 scale-105'
                             : 'bg-slate-50 hover:bg-indigo-50 text-slate-500 hover:text-indigo-700 border-slate-200 active:scale-95'
                         }`}
-                        title={`Nghe phát âm câu ${sIdx + 1} (Web Speech API)`}
+                        title={`Listen to pronunciation for sentence ${sIdx + 1} (Web Speech API)`}
                       >
                         <Volume2 className={`w-3.5 h-3.5 ${isThisPlaying ? 'animate-bounce text-white' : ''}`} />
                       </button>

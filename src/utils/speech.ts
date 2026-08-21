@@ -139,3 +139,5 @@ export function playPronunciation(
     return false;
   }
 }
+
+export const speakWord = playPronunciation;

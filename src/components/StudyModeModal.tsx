@@ -18,11 +18,15 @@ import {
   RefreshCw,
   Award,
   ArrowRight,
+  ArrowLeft,
   Eye,
+  Star,
+  Zap,
 } from 'lucide-react';
 import { playPronunciation } from '../utils/speech';
 import { getThreeContextAwareExamples, fetchAlternativeAcademicScenarios, ContextScenario } from '../utils/academicExamples';
 import { triggerStreakCelebrationConfetti } from '../utils/confetti';
+import { StarSystemData } from '../utils/starSystem';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface StudyModeModalProps {
@@ -34,6 +38,8 @@ interface StudyModeModalProps {
   onToggleLearned: (id: string) => void;
   onToggleSave: (id: string) => void;
   onShowToast: (text: string, type: 'success' | 'info' | 'error') => void;
+  starData?: StarSystemData;
+  onOpenDoubleReview?: (word: WordItem) => void;
 }
 
 export const StudyModeModal: React.FC<StudyModeModalProps> = ({
@@ -45,19 +51,68 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
   onToggleLearned,
   onToggleSave,
   onShowToast,
+  starData,
+  onOpenDoubleReview,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'word' | 'examples'>('word');
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right'>('right');
   const [isPlayingWord, setIsPlayingWord] = useState(false);
   const [playingSentenceIndex, setPlayingSentenceIndex] = useState<number | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isAlternativeMode, setIsAlternativeMode] = useState(false);
   const [imgError, setImgError] = useState(false);
 
+  // Touch swipe gesture tracking
+  const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
+
+  const goToTab = (tab: 'word' | 'examples') => {
+    if (tab === activeTab) return;
+    setSwipeDirection(tab === 'examples' ? 'left' : 'right');
+    setActiveTab(tab);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      time: Date.now(),
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    touchStartRef.current = null;
+
+    // Detect horizontal swipe gesture:
+    // 1. Min horizontal distance of 40px
+    // 2. Horizontal movement exceeds vertical movement (to allow normal scrolling)
+    // 3. Gesture completed within 700ms
+    if (Math.abs(deltaX) >= 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2 && deltaTime < 700) {
+      if (deltaX < 0) {
+        // Swiped Left (finger moved left) -> navigate forward to Examples page
+        if (activeTab === 'word') {
+          goToTab('examples');
+        }
+      } else {
+        // Swiped Right (finger moved right) -> navigate back to Word page
+        if (activeTab === 'examples') {
+          goToTab('word');
+        }
+      }
+    }
+  };
+
   // Reset index when opening
   useEffect(() => {
     if (isOpen) {
       setActiveTab('word');
+      setSwipeDirection('right');
       setIsPlayingWord(false);
       setPlayingSentenceIndex(null);
       setImgError(false);
@@ -83,17 +138,19 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
         if (currentIndex < words.length - 1) {
           setCurrentIndex((prev) => prev + 1);
           setActiveTab('word');
+          setSwipeDirection('right');
           setImgError(false);
         }
       } else if (e.key === 'ArrowLeft') {
         if (currentIndex > 0) {
           setCurrentIndex((prev) => prev - 1);
           setActiveTab('word');
+          setSwipeDirection('right');
           setImgError(false);
         }
       } else if (e.key === 'Tab') {
         e.preventDefault();
-        setActiveTab((prev) => (prev === 'word' ? 'examples' : 'word'));
+        goToTab(activeTab === 'word' ? 'examples' : 'word');
       }
     };
 
@@ -114,7 +171,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
       onEnd: () => setIsPlayingWord(false),
       onError: () => {
         setIsPlayingWord(false);
-        onShowToast('Web Speech API: Trình duyệt chưa hỗ trợ phát âm', 'info');
+        onShowToast('Web Speech API: Voice not supported', 'info');
       },
     });
   };
@@ -130,7 +187,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
       onEnd: () => setPlayingSentenceIndex(null),
       onError: () => {
         setPlayingSentenceIndex(null);
-        onShowToast('Không thể phát âm câu này', 'info');
+        onShowToast('Unable to pronounce this sentence', 'info');
       },
     });
   };
@@ -139,7 +196,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
     const text = `${currentWord.word} (${currentWord.ipa})\n${currentWord.definition}\n${currentWord.etymology ? `Etymology: ${currentWord.etymology}` : ''}`;
     navigator.clipboard.writeText(text);
     setIsCopied(true);
-    onShowToast(`Đã sao chép từ "${currentWord.word}"`, 'success');
+    onShowToast(`Copied "${currentWord.word}"`, 'success');
     setTimeout(() => setIsCopied(false), 2000);
   };
 
@@ -147,10 +204,11 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
     if (currentIndex < words.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setActiveTab('word');
+      setSwipeDirection('right');
       setImgError(false);
     } else {
       triggerStreakCelebrationConfetti();
-      onShowToast('🎉 Bạn đã xem hết toàn bộ 10 từ của ngày hôm nay!', 'success');
+      onShowToast('🎉 You completed all 10 words for today!', 'success');
       onClose();
     }
   };
@@ -159,6 +217,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
       setActiveTab('word');
+      setSwipeDirection('right');
       setImgError(false);
     }
   };
@@ -194,14 +253,43 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
         
         {/* Top Header Bar */}
         <div className="bg-slate-900 text-white px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between gap-3 shrink-0 border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-1 rounded-full bg-indigo-600 text-white font-black text-xs uppercase tracking-wider shadow-xs">
-              Vào Học • Thẻ {currentIndex + 1}/{words.length}
+              Study Mode • Card {currentIndex + 1}/{words.length}
             </span>
+            
+            {/* Star Points Status Pill */}
+            {isLearned ? (
+              starData?.wordRecords[currentWord.id]?.isDoubled ? (
+                <span className="inline-flex items-center gap-1 text-xs font-black text-amber-950 bg-amber-400 border border-amber-500 px-2.5 py-0.5 rounded-full">
+                  <Star className="w-3 h-3 fill-slate-950 text-slate-950" />
+                  20 ⭐ (2x Boosted)
+                </span>
+              ) : onOpenDoubleReview ? (
+                <button
+                  onClick={() => onOpenDoubleReview(currentWord)}
+                  className="inline-flex items-center gap-1 text-xs font-black text-amber-950 bg-amber-300 hover:bg-amber-400 px-2.5 py-0.5 rounded-full transition-all cursor-pointer animate-pulse"
+                  title="Voluntary Review: Double to 20 Stars (12:00 AM - 11:59 PM)"
+                >
+                  <Zap className="w-3 h-3 fill-amber-900" />
+                  10 ⭐ (Double x2)
+                </button>
+              ) : (
+                <span className="text-xs font-bold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full">
+                  10 ⭐
+                </span>
+              )
+            ) : (
+              <span className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-400">
+                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                +10 Stars
+              </span>
+            )}
+
             {isLearned && (
-              <span className="hidden sm:inline-flex items-center gap-1 text-xs font-black text-emerald-300 bg-emerald-950/80 border border-emerald-700 px-2 py-0.5 rounded-full">
+              <span className="hidden md:inline-flex items-center gap-1 text-xs font-black text-emerald-300 bg-emerald-950/80 border border-emerald-700 px-2 py-0.5 rounded-full">
                 <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                Đã thuộc
+                Learned
               </span>
             )}
           </div>
@@ -216,7 +304,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   ? 'bg-indigo-600 text-white ring-2 ring-indigo-400 scale-105'
                   : 'bg-slate-800 hover:bg-slate-700 text-indigo-300'
               }`}
-              title="Phát âm từ vựng (Web Speech API)"
+              title="Pronounce word (Web Speech API)"
             >
               <Volume2 className={`w-5 h-5 ${isPlayingWord ? 'animate-bounce' : ''}`} />
             </button>
@@ -229,7 +317,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   ? 'bg-amber-500 text-white shadow-xs'
                   : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
               }`}
-              title={isSaved ? 'Đã lưu' : 'Lưu từ'}
+              title={isSaved ? 'Saved' : 'Save word'}
             >
               <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-white' : ''}`} />
             </button>
@@ -238,7 +326,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             <button
               onClick={onClose}
               className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer ml-1"
-              title="Đóng chế độ học (ESC)"
+              title="Close Study Mode (ESC)"
             >
               <X className="w-5 h-5" />
             </button>
@@ -253,10 +341,10 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
           />
         </div>
 
-        {/* Two-Page Tab Switcher: [Trang 1: Từ vựng & Nghĩa] vs [Trang 2: 3 Ví dụ chuẩn] */}
+        {/* Two-Page Tab Switcher: [Page 1: Word & Meaning] vs [Page 2: 3 Academic Examples] */}
         <div className="bg-slate-100 p-2 sm:px-6 flex items-center gap-2 border-b border-slate-200 shrink-0">
           <button
-            onClick={() => setActiveTab('word')}
+            onClick={() => goToTab('word')}
             className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'word'
                 ? 'bg-white text-indigo-950 shadow-sm border-2 border-indigo-200'
@@ -264,11 +352,11 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             }`}
           >
             <BookOpen className="w-4 h-4 text-indigo-600" />
-            <span>Trang 1: Từ Vựng & Nghĩa</span>
+            <span>Page 1: Word & Definition</span>
           </button>
 
           <button
-            onClick={() => setActiveTab('examples')}
+            onClick={() => goToTab('examples')}
             className={`flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'examples'
                 ? 'bg-white text-indigo-950 shadow-sm border-2 border-indigo-200'
@@ -276,24 +364,64 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             }`}
           >
             <GraduationCap className="w-4 h-4 text-indigo-600" />
-            <span>Trang 2: 3 Ví Dụ Học Thuật</span>
+            <span>Page 2: 3 Academic Examples</span>
             <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-800 font-black">
               3
             </span>
           </button>
         </div>
 
-        {/* Scrollable / Fit Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-          <AnimatePresence mode="wait">
+        {/* Mobile Touch Swipe Indicator Pill Bar */}
+        <div className="sm:hidden px-4 py-1.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-[11px] font-bold text-slate-500 select-none">
+          {activeTab === 'word' ? (
+            <>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                <span className="text-slate-700 font-black">1/2: Word</span>
+              </div>
+              <button
+                onClick={() => goToTab('examples')}
+                className="flex items-center gap-1 text-indigo-600 font-extrabold hover:text-indigo-800 cursor-pointer"
+              >
+                <span>Swipe left for 3 Examples</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => goToTab('word')}
+                className="flex items-center gap-1 text-indigo-600 font-extrabold hover:text-indigo-800 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Swipe right for Word</span>
+              </button>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-slate-300"></span>
+                <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
+                <span className="text-slate-700 font-black">2/2: Examples</span>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Scrollable / Fit Content Body with Horizontal Touch-Swipe Listeners */}
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 touch-pan-y"
+        >
+          <AnimatePresence mode="wait" custom={swipeDirection}>
             {activeTab === 'word' ? (
-              /* TAB 1: Từ vựng, Phiên âm, Hình ảnh minh họa, Định nghĩa, Gốc từ Latin/Greek */
+              /* TAB 1: Word, Phonetics, Illustration, Definition, Latin/Greek Roots */
               <motion.div
                 key={`word-${currentWord.id}`}
-                initial={{ opacity: 0, x: -10 }}
+                custom={swipeDirection}
+                initial={{ opacity: 0, x: swipeDirection === 'left' ? -25 : 25 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, x: swipeDirection === 'left' ? 25 : -25 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
                 className="space-y-4"
               >
                 {/* Word Title & Pronunciation Box */}
@@ -313,7 +441,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   <button
                     onClick={handleListenWord}
                     className="p-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md cursor-pointer transition-transform active:scale-95 shrink-0"
-                    title="Nghe phát âm chuẩn"
+                    title="Listen to pronunciation"
                   >
                     <Volume2 className="w-6 h-6" />
                   </button>
@@ -332,9 +460,32 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   </span>
                 </div>
 
-                {/* Illustration Image (Compact fit on mobile) */}
+                {/* Definition Box - Placed directly under the word & badges */}
+                <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 sm:p-5 shadow-xs">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-1.5">
+                    Definition & Strategic Meaning
+                  </span>
+                  <p className="text-base sm:text-lg text-slate-900 font-semibold leading-relaxed">
+                    {currentWord.definition}
+                  </p>
+                </div>
+
+                {/* Etymology / Morphological Roots */}
+                {currentWord.etymology && (
+                  <div className="bg-amber-50/70 rounded-2xl border-2 border-amber-200 p-4 sm:p-5 shadow-xs">
+                    <div className="flex items-center gap-2 text-xs font-black text-amber-900 uppercase tracking-wider mb-1.5">
+                      <History className="w-4 h-4 text-amber-700" />
+                      <span>Latin / Greek Etymology & Morphology:</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
+                      {currentWord.etymology}
+                    </p>
+                  </div>
+                )}
+
+                {/* Illustration Image - Positioned at the bottom below definition */}
                 {currentWord.imageUrl && !imgError && (
-                  <div className="relative w-full h-40 sm:h-52 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-xs group">
+                  <div className="relative w-full h-36 sm:h-48 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 shadow-xs group">
                     <img
                       src={currentWord.imageUrl}
                       alt={currentWord.word}
@@ -349,38 +500,16 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                     </div>
                   </div>
                 )}
-
-                {/* Definition Box */}
-                <div className="bg-white rounded-2xl border-2 border-slate-200 p-4 sm:p-5 shadow-xs">
-                  <span className="text-xs font-black text-slate-400 uppercase tracking-wider block mb-1.5">
-                    Định nghĩa & Ý nghĩa chiến lược
-                  </span>
-                  <p className="text-base sm:text-lg text-slate-900 font-semibold leading-relaxed">
-                    {currentWord.definition}
-                  </p>
-                </div>
-
-                {/* Etymology / Morphological Roots */}
-                {currentWord.etymology && (
-                  <div className="bg-amber-50/70 rounded-2xl border-2 border-amber-200 p-4 sm:p-5 shadow-xs">
-                    <div className="flex items-center gap-2 text-xs font-black text-amber-900 uppercase tracking-wider mb-1.5">
-                      <History className="w-4 h-4 text-amber-700" />
-                      <span>Gốc từ Latin & Cấu trúc hình thái học:</span>
-                    </div>
-                    <p className="text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
-                      {currentWord.etymology}
-                    </p>
-                  </div>
-                )}
               </motion.div>
             ) : (
-              /* TAB 2: 3 Ví dụ học thuật theo chuẩn IELTS C1/C2 & Collocations */
+              /* TAB 2: 3 Academic Examples & Collocations */
               <motion.div
                 key={`examples-${currentWord.id}`}
-                initial={{ opacity: 0, x: 10 }}
+                custom={swipeDirection}
+                initial={{ opacity: 0, x: swipeDirection === 'left' ? 25 : -25 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, x: swipeDirection === 'left' ? -25 : 25 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
                 className="space-y-4"
               >
                 {/* Header of examples tab */}
@@ -388,7 +517,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   <div className="flex items-center gap-1.5">
                     <GraduationCap className="w-5 h-5 text-indigo-600" />
                     <span className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">
-                      3 Ví dụ học thuật (IELTS Band 8.0–9.0):
+                      3 Academic Examples (IELTS Band 8.0–9.0):
                     </span>
                   </div>
 
@@ -396,14 +525,14 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                     onClick={() => {
                       setIsAlternativeMode((prev) => !prev);
                       onShowToast(
-                        !isAlternativeMode ? 'Đã đổi sang 3 ví dụ chuyên sâu mới' : 'Đã quay lại ví dụ chuẩn',
+                        !isAlternativeMode ? 'Switched to 3 new advanced examples' : 'Returned to standard examples',
                         'info'
                       );
                     }}
                     className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>{isAlternativeMode ? 'Ví dụ chuẩn' : 'Ngữ cảnh mở rộng'}</span>
+                    <span>{isAlternativeMode ? 'Standard' : 'Alternative'}</span>
                   </button>
                 </div>
 
@@ -434,7 +563,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                                 ? 'bg-indigo-600 text-white border-indigo-700 ring-2 ring-indigo-300 scale-105'
                                 : 'bg-slate-50 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border-slate-200'
                             }`}
-                            title="Nghe phát âm câu này"
+                            title="Listen to this sentence"
                           >
                             <Volume2 className={`w-4 h-4 ${isThisPlaying ? 'animate-bounce' : ''}`} />
                           </button>
@@ -460,7 +589,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
                   <div className="bg-slate-50 rounded-2xl border-2 border-slate-200 p-4 space-y-2">
                     <div className="flex items-center gap-1.5 text-xs font-black text-slate-700 uppercase tracking-wider">
                       <Tag className="w-4 h-4 text-indigo-600" />
-                      <span>Cụm từ cố định (Academic Collocations):</span>
+                      <span>Academic Collocations:</span>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
                       {currentWord.collocations.map((col, idx) => (
@@ -488,7 +617,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             className="py-2.5 px-3 sm:px-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Từ trước</span>
+            <span className="hidden sm:inline">Previous</span>
           </button>
 
           {/* Mark as Learned Toggle Button */}
@@ -501,7 +630,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             }`}
           >
             <CheckCircle2 className={`w-4 h-4 ${isLearned ? 'text-white' : 'text-emerald-700'}`} />
-            <span>{isLearned ? '✓ Đã thuộc từ này' : 'Xác nhận đã học'}</span>
+            <span>{isLearned ? '✓ Learned' : 'Mark as Learned'}</span>
           </button>
 
           {/* Next Button */}
@@ -510,7 +639,7 @@ export const StudyModeModal: React.FC<StudyModeModalProps> = ({
             className="py-2.5 px-3 sm:px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center gap-1 cursor-pointer transition-colors shadow-sm active:scale-98"
           >
             <span className="hidden sm:inline">
-              {currentIndex === words.length - 1 ? 'Hoàn thành' : 'Từ tiếp'}
+              {currentIndex === words.length - 1 ? 'Finish' : 'Next'}
             </span>
             <ChevronRight className="w-4 h-4" />
           </button>

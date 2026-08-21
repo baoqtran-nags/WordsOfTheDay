@@ -16,7 +16,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: '7_day_streak',
     title: '7-Day Streak',
-    description: 'Duy trì chuỗi học 10 từ liên tục trong 7 ngày không gián đoạn.',
+    description: 'Maintain a 10-word daily study streak for 7 consecutive days.',
     iconName: 'Flame',
     category: 'streak',
     isUnlocked: false,
@@ -27,7 +27,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: '100_words_mastered',
     title: '100 Words Mastered',
-    description: 'Đã học và xác nhận ghi nhớ 100 từ vựng học thuật C1/C2 nâng cao.',
+    description: 'Master and confirm retention of 100 advanced C1/C2 academic vocabulary items.',
     iconName: 'Trophy',
     category: 'mastery',
     isUnlocked: false,
@@ -38,7 +38,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: 'quiz_ace',
     title: 'Quiz Ace',
-    description: 'Đạt điểm tuyệt đối 100% trong bài kiểm tra trắc nghiệm Fill-in Quiz.',
+    description: 'Achieve a perfect 100% score on any interactive fill-in quiz challenge.',
     iconName: 'Target',
     category: 'quiz',
     isUnlocked: false,
@@ -49,7 +49,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: 'first_day_champ',
     title: 'First Day Champ',
-    description: 'Hoàn thành trọn vẹn 10 từ vựng đầu tiên trong ngày để mở chuỗi.',
+    description: 'Complete all 10 words in a single day to inaugurate your daily streak.',
     iconName: 'Sparkles',
     category: 'streak',
     isUnlocked: false,
@@ -60,7 +60,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: 'spaced_repetition_master',
     title: 'Memory Architect',
-    description: 'Hoàn thành bài mini-quiz ôn tập Spaced Repetition cho từ học > 3 ngày.',
+    description: 'Complete a Spaced Repetition retention review for words learned 3+ days ago.',
     iconName: 'Brain',
     category: 'review',
     isUnlocked: false,
@@ -71,7 +71,7 @@ export const INITIAL_ACHIEVEMENTS: AchievementBadge[] = [
   {
     id: 'vocabulary_collector',
     title: 'Vocab Collector',
-    description: 'Lưu trữ hơn 10 từ vựng tâm đắc vào kho lưu trữ cá nhân.',
+    description: 'Bookmark and store 10 or more target terms in your personal glossary.',
     iconName: 'BookOpen',
     category: 'mastery',
     isUnlocked: false,

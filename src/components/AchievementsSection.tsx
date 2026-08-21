@@ -99,13 +99,13 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ badges
               Digital Badges & Milestones
             </h3>
             <span className="text-[11px] text-slate-500 font-semibold block -mt-0.5">
-              Huy hiệu thành tích mở khóa
+              Unlocked learning achievements
             </span>
           </div>
         </div>
 
         <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
-          {unlockedCount}/{totalCount} Mở
+          {unlockedCount}/{totalCount} Unlocked
         </span>
       </div>
 
@@ -140,7 +140,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ badges
 
                   {badge.isUnlocked ? (
                     <span className="text-[10px] font-bold text-emerald-700 block mt-0.5">
-                      ✓ Đã mở khóa
+                      ✓ Unlocked
                     </span>
                   ) : (
                     <div className="mt-1">
@@ -183,7 +183,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ badges
                   ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
                   : 'bg-slate-100 text-slate-600 border-slate-200'
               }`}>
-                {selectedBadge.isUnlocked ? '✓ Huy hiệu đã đạt được' : '🔒 Chưa mở khóa'}
+                {selectedBadge.isUnlocked ? '✓ Badge Unlocked' : '🔒 Locked'}
               </span>
 
               <h4 className="text-xl font-extrabold text-slate-900 mb-1 font-['Plus_Jakarta_Sans',sans-serif]">
@@ -197,7 +197,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ badges
               {/* Progress Detail */}
               <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 mb-5 text-xs text-slate-700">
                 <div className="flex justify-between font-bold mb-1">
-                  <span>Tiến trình hoàn thành:</span>
+                  <span>Completion Progress:</span>
                   <span className="font-extrabold text-indigo-700">
                     {selectedBadge.currentProgress} / {selectedBadge.maxProgress}
                   </span>
@@ -216,7 +216,7 @@ export const AchievementsSection: React.FC<AchievementsSectionProps> = ({ badges
                 onClick={() => setSelectedBadge(null)}
                 className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm cursor-pointer transition-colors"
               >
-                Đóng
+                Close
               </button>
             </motion.div>
           </div>

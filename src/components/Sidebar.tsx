@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play, Star, Zap } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 import { QuoteItem, StreakData, AchievementBadge, LearnedWordMeta } from '../types';
 import { playPronunciation } from '../utils/speech';
@@ -36,6 +36,10 @@ interface SidebarProps {
   justCompletedSet?: boolean;
   badges: AchievementBadge[];
   learnedMeta: Record<string, LearnedWordMeta>;
+  todayStars?: number;
+  totalStars?: number;
+  onOpenStarReviewHub?: () => void;
+  isOnline?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -64,6 +68,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   justCompletedSet = false,
   badges,
   learnedMeta,
+  todayStars = 0,
+  totalStars = 0,
+  onOpenStarReviewHub,
+  isOnline = true,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -124,20 +132,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Sparkles className="w-3 h-3 mr-1 text-indigo-700" />
                 C1 / Advanced
               </span>
-              <span className="text-xs text-slate-500 font-semibold">10 Từ mỗi ngày • Tự cập nhật 12:00 AM</span>
+              <span className="text-xs text-slate-500 font-semibold">10 Daily Words • Auto 12:00 AM Reset</span>
             </div>
           </div>
         </div>
 
-        {/* Date line */}
-        <div className="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3 flex items-center justify-between gap-2.5 mb-4 text-indigo-950 font-bold text-sm sm:text-base">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-700 shrink-0" />
-            <span>Today: {todayFormatted}</span>
+        {/* Date line & Offline Status */}
+        <div className="bg-indigo-50/80 border border-indigo-200 rounded-xl p-3 flex flex-col gap-2 mb-4 text-indigo-950 font-bold text-sm sm:text-base">
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-indigo-700 shrink-0" />
+              <span>Today: {todayFormatted}</span>
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-200/80 text-indigo-900">
+              12:00 AM Reset
+            </span>
           </div>
-          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-200/80 text-indigo-900">
-            12:00 AM Reset
-          </span>
+          {!isOnline && (
+            <div className="flex items-center gap-1.5 text-xs text-amber-900 bg-amber-100 border border-amber-300 px-2.5 py-1 rounded-lg font-bold">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+              <span>Offline Mode: 10 daily words cached & fully playable</span>
+            </div>
+          )}
         </div>
 
         {/* Daily Streak Card with celebratory pulse animation */}
@@ -185,14 +201,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </motion.div>
               <div>
                 <span className="text-[11px] font-black uppercase tracking-wider text-amber-100 block">
-                  Chuỗi học liên tiếp (Daily Streak)
+                  Daily Streak
                 </span>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                     {streakData.currentStreak}
                   </span>
                   <span className="text-sm font-bold text-amber-100">
-                    {streakData.currentStreak === 1 ? 'Ngày liên tục' : 'Ngày liên tục'}
+                    {streakData.currentStreak === 1 ? 'day streak' : 'days streak'}
                   </span>
                 </div>
               </div>
@@ -202,9 +218,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="bg-black/25 backdrop-blur-xs border border-white/20 rounded-xl px-2.5 py-1 text-right shrink-0">
               <div className="flex items-center gap-1 text-[10px] font-bold text-amber-200 uppercase">
                 <Trophy className="w-3 h-3 text-amber-300" />
-                <span>Kỷ lục</span>
+                <span>Best</span>
               </div>
-              <span className="text-sm font-black text-white">{streakData.longestStreak} ngày</span>
+              <span className="text-sm font-black text-white">{streakData.longestStreak} {streakData.longestStreak === 1 ? 'day' : 'days'}</span>
             </div>
           </div>
 
@@ -222,7 +238,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         ? 'bg-amber-400/40 text-white border-2 border-dashed border-white'
                         : 'bg-black/25 text-white/50'
                     }`}
-                    title={`${d.dateString}: ${d.isCompleted ? 'Hoàn thành' : 'Chưa hoàn thành'}`}
+                    title={`${d.dateString}: ${d.isCompleted ? 'Completed' : 'Not completed'}`}
                   >
                     {d.isCompleted ? <Check className="w-4 h-4 stroke-[3]" /> : d.isToday ? '•' : ''}
                   </div>
@@ -232,13 +248,62 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <div className="mt-2 text-center text-[11px] font-bold text-amber-100">
               {isCompletedToday ? (
-                <span className="text-emerald-100">🎉 Đã duy trì chuỗi ngày hôm nay!</span>
+                <span className="text-emerald-100">🎉 Daily streak sustained today!</span>
               ) : (
-                <span>Học xong 10 từ hôm nay để tăng chuỗi 🔥</span>
+                <span>Complete all 10 words to build your streak 🔥</span>
               )}
             </div>
           </div>
         </motion.div>
+
+        {/* Daily Stars & 2x Multiplier Review Card */}
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100/90 border-2 border-amber-300 rounded-2xl p-4 mb-4 shadow-xs">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 font-black text-amber-950 text-sm">
+              <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+              <span>Learning Stars</span>
+            </div>
+            <span className="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 flex items-center gap-0.5">
+              <Zap className="w-3 h-3 fill-slate-950" />
+              2x Multiplier
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200">
+              <span className="text-[10px] font-bold text-amber-800 uppercase block">Today's Stars</span>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-xl font-black text-amber-950">{todayStars}</span>
+                <span className="text-xs text-amber-600 font-bold">⭐</span>
+              </div>
+            </div>
+            <div className="bg-white/80 rounded-xl p-2.5 border border-amber-200">
+              <span className="text-[10px] font-bold text-amber-800 uppercase block">All-Time Stars</span>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="text-xl font-black text-amber-950">{totalStars}</span>
+                <span className="text-xs text-amber-600 font-bold">⭐</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-amber-900 font-bold mb-2">
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-amber-700" />
+              <span>12:00 AM – 11:59 PM Daily</span>
+            </div>
+            <span>+10 Base / +20 Doubled</span>
+          </div>
+
+          {onOpenStarReviewHub && (
+            <button
+              onClick={onOpenStarReviewHub}
+              className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-all active:scale-95"
+            >
+              <Zap className="w-3.5 h-3.5 fill-slate-950" />
+              <span>Open 2x Star Review Hub</span>
+            </button>
+          )}
+        </div>
 
         {/* Daily Learning Progress Box */}
         <div className={`p-4 rounded-xl border-2 mb-4 transition-all ${
@@ -253,10 +318,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               ) : (
                 <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0" />
               )}
-              <span>Tiến độ học hôm nay:</span>
+              <span>Today's Progress:</span>
             </div>
             <span className="text-sm font-black px-2 py-0.5 rounded-lg bg-white border border-slate-200 shadow-2xs">
-              {learnedCountInCurrentSet}/{totalCurrentWordsCount} từ
+              {learnedCountInCurrentSet}/{totalCurrentWordsCount} words
             </span>
           </div>
 
@@ -272,16 +337,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {isAllLearned ? (
             <div className="text-xs sm:text-sm font-bold text-emerald-800 bg-white p-2.5 rounded-lg border border-emerald-200 text-center">
-              🎉 Xuất sắc! Bạn đã hoàn thành 10/10 từ và tăng chuỗi học!
+              🎉 Excellent! You completed 10/10 words and maintained your streak!
             </div>
           ) : (
             <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-              <span>Đạt {progressPercent}% mục tiêu ngày</span>
+              <span>{progressPercent}% of daily goal</span>
               <button
                 onClick={onMarkAllLearned}
                 className="text-indigo-600 hover:text-indigo-800 font-bold underline cursor-pointer"
               >
-                Học xong cả {totalCurrentWordsCount} từ
+                Mark all {totalCurrentWordsCount} mastered
               </button>
             </div>
           )}
@@ -292,13 +357,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={onResetLearnedCurrentSet}
                 className="text-[11px] text-slate-400 hover:text-rose-600 font-medium inline-flex items-center gap-1 cursor-pointer"
               >
-                <RotateCcw className="w-3 h-3" /> Đặt lại tiến độ
+                <RotateCcw className="w-3 h-3" /> Reset progress
               </button>
             </div>
           )}
         </div>
 
-        {/* PRIMARY "VÀO HỌC NGAY" IMMERSIVE 2-PAGE MOBILE/DESKTOP STUDY BUTTON */}
+        {/* PRIMARY "START STUDYING" IMMERSIVE 2-PAGE MOBILE/DESKTOP STUDY BUTTON */}
         <button
           id="sidebar-study-now-btn"
           onClick={onOpenStudyMode}
@@ -307,7 +372,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
             <Play className="w-4 h-4 text-white fill-white ml-0.5" />
           </div>
-          <span>Vào Học Ngay (10 Từ Hôm Nay)</span>
+          <span>Study Mode (Today's 10 Words)</span>
         </button>
 
         {/* Manual Refresh / Regenerate Button */}
@@ -318,7 +383,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-slate-300 rounded-xl bg-slate-50 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all shadow-2xs active:scale-98 disabled:opacity-60 cursor-pointer mb-3"
         >
           <RefreshCw className={`w-4 h-4 text-slate-600 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>Tạo lại bộ từ khác</span>
+          <span>Generate Different Set</span>
         </button>
 
         {/* Dedicated "Review Mode" Button (Spaced Repetition 3+ Days) */}
@@ -332,13 +397,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Brain className="w-4 h-4" />
             </div>
             <div className="text-left">
-              <span className="block leading-tight">Review Mode (Ôn tập C1/C2)</span>
-              <span className="text-[11px] text-indigo-700 font-semibold">Ghi nhớ dài hạn (3+ ngày trước)</span>
+              <span className="block leading-tight">Review Mode (C1/C2 Recall)</span>
+              <span className="text-[11px] text-indigo-700 font-semibold">Spaced repetition (learned 3+ days ago)</span>
             </div>
           </div>
 
           <span className="px-2 py-0.5 rounded-full text-xs font-black bg-indigo-600 text-white shadow-2xs">
-            {wordsDueForReviewCount} từ
+            {wordsDueForReviewCount} words
           </span>
         </button>
 

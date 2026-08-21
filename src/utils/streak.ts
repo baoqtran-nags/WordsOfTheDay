@@ -93,7 +93,7 @@ export const getLast7DaysStatus = (completedDates: string[]): DayStatus[] => {
   const days: DayStatus[] = [];
   const today = new Date();
   const todayStr = getLocalDateString(today);
-  const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
