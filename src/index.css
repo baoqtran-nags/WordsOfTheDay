@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+/* iOS Safe Area & iPhone 15 Pro Max Dynamic Island optimization */
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}

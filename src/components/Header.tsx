@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Star, Zap, WifiOff, CheckCircle2 } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Star, Zap, WifiOff, CheckCircle2, Smartphone } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 
 export type FontSizeMode = 'standard' | 'large' | 'xlarge';
@@ -21,6 +21,7 @@ interface HeaderProps {
   totalStars: number;
   onOpenStarReviewHub: () => void;
   isOnline?: boolean;
+  onOpenIosInstall?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   totalStars,
   onOpenStarReviewHub,
   isOnline = true,
+  onOpenIosInstall,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -155,6 +157,20 @@ export const Header: React.FC<HeaderProps> = ({
               <CheckSquare className="w-4 h-4 text-emerald-600" />
               <span>Practice ({activeCount})</span>
             </button>
+
+            {/* Install on iPhone Button */}
+            {onOpenIosInstall && (
+              <button
+                id="header-ios-install-btn"
+                onClick={onOpenIosInstall}
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs sm:text-sm font-extrabold rounded-xl bg-slate-900 hover:bg-slate-800 text-white border-2 border-slate-900 transition-all shadow-xs cursor-pointer active:scale-95"
+                title="Hướng dẫn cài đặt trên iPhone 15 Pro Max (Add to Home Screen)"
+              >
+                <Smartphone className="w-4 h-4 text-indigo-300" />
+                <span className="hidden sm:inline">Cài đặt iPhone</span>
+                <span className="sm:hidden">iOS App</span>
+              </button>
+            )}
 
             {/* Glossary / Explorer */}
             <button

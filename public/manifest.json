@@ -1,0 +1,18 @@
+{
+  "name": "Words of the Day — C1/C2 English",
+  "short_name": "WOTD English",
+  "description": "Daily 10 Advanced C1/C2 Vocabulary, Idioms & Industry English for IELTS and VSTEP.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#4338ca",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play, Star, Zap } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play, Star, Zap, Smartphone } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 import { QuoteItem, StreakData, AchievementBadge, LearnedWordMeta } from '../types';
 import { playPronunciation } from '../utils/speech';
@@ -40,6 +40,7 @@ interface SidebarProps {
   totalStars?: number;
   onOpenStarReviewHub?: () => void;
   isOnline?: boolean;
+  onOpenIosInstall?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -72,6 +73,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalStars = 0,
   onOpenStarReviewHub,
   isOnline = true,
+  onOpenIosInstall,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
     month: 'long',
@@ -536,6 +538,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
       </div>
+
+      {/* iPhone 15 Pro Max Quick Install Card */}
+      {onOpenIosInstall && (
+        <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl border-2 border-indigo-500/40 p-4 shadow-md flex flex-col gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0">
+              <Smartphone className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-black text-white">iPhone 15 Pro Max</h4>
+              <p className="text-[11px] text-indigo-300 font-semibold">Cài đặt trực tiếp • Không cần App Store</p>
+            </div>
+          </div>
+          <button
+            onClick={onOpenIosInstall}
+            className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-black text-white flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
+          >
+            <span>Xem cách cài đặt (3 bước)</span>
+          </button>
+        </div>
+      )}
 
     </aside>
   );

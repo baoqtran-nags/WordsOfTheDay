@@ -12,6 +12,7 @@ import { StudyModeModal } from './components/StudyModeModal';
 import { FloatingStudyButton } from './components/FloatingStudyButton';
 import { DoubleStarReviewModal } from './components/DoubleStarReviewModal';
 import { DailyStarReviewHubModal } from './components/DailyStarReviewHubModal';
+import { IosInstallModal } from './components/IosInstallModal';
 import { Toast, ToastMessage } from './components/Toast';
 import { FontSizeMode, Header } from './components/Header';
 import { loadStreakData, recordDailyCompletion, getLocalDateString } from './utils/streak';
@@ -147,6 +148,7 @@ export default function App() {
   const [isPracticeOpen, setIsPracticeOpen] = useState<boolean>(false);
   const [isReviewOpen, setIsReviewOpen] = useState<boolean>(false);
   const [isGlossaryOpen, setIsGlossaryOpen] = useState<boolean>(false);
+  const [isIosInstallOpen, setIsIosInstallOpen] = useState<boolean>(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
   const showToast = useCallback((text: string, type: 'success' | 'info' | 'error' = 'info') => {
@@ -636,6 +638,7 @@ export default function App() {
                 totalStars={starData.totalStars}
                 onOpenStarReviewHub={() => setIsDailyStarHubOpen(true)}
                 isOnline={isOnline}
+                onOpenIosInstall={() => setIsIosInstallOpen(true)}
               />
             </div>
           )}
@@ -934,6 +937,12 @@ export default function App() {
         onClose={() => setIsGlossaryOpen(false)}
         savedIds={savedWordIds}
         onToggleSave={handleToggleSave}
+      />
+
+      {/* iPhone 15 Pro Max Direct Install Guide Modal */}
+      <IosInstallModal
+        isOpen={isIosInstallOpen}
+        onClose={() => setIsIosInstallOpen(false)}
       />
     </div>
   );
