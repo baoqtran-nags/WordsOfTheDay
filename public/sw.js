@@ -1,36 +1,41 @@
 // Service Worker for Words of the Day (WOTD)
 // Cache daily words, static assets, and shell for full offline functionality
 
-const CACHE_NAME = 'wotd-cache-v1';
+const CACHE_NAME = 'wotd-cache-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './src/main.tsx',
-  './src/index.css',
-  './src/App.tsx'
+  './icon.svg',
+  './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('SW pre-cache warning:', err);
-      });
-    }).then(() => self.skipWaiting())
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        return Promise.allSettled(
+          STATIC_ASSETS.map((asset) => cache.add(asset).catch(() => {}))
+        );
+      })
+      .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
-            return caches.delete(name);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((name) => {
+            if (name !== CACHE_NAME) {
+              return caches.delete(name);
+            }
+          })
+        );
+      })
+      .then(() => self.clients.claim())
   );
 });
 
@@ -40,32 +45,70 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Skip chrome-extension or non-http schemes
-  if (!url.protocol.startsWith('http')) return;
+  // Skip non-http schemes, dev websockets, and Vite internal dev routes
+  if (
+    !url.protocol.startsWith('http') ||
+    url.pathname.includes('/@vite') ||
+    url.pathname.includes('/@react') ||
+    url.pathname.includes('/@fs') ||
+    url.pathname.startsWith('/__vite')
+  ) {
+    return;
+  }
 
-  // Stale-While-Revalidate strategy for app assets
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
+  // Navigation requests (HTML document loads): Network-first with cache fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
         .then((networkResponse) => {
-          if (
-            networkResponse &&
-            networkResponse.status === 200 &&
-            networkResponse.type === 'basic'
-          ) {
-            const responseToCache = networkResponse.clone();
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
+              cache.put(event.request, copy);
             });
           }
           return networkResponse;
         })
-        .catch(() => {
-          // If offline and not in cache, fallback gracefully
-          return cachedResponse;
-        });
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          const fallback = await caches.match('./index.html');
+          if (fallback) return fallback;
+          return new Response('<h1>Offline - Please reconnect to Internet</h1>', {
+            headers: { 'Content-Type': 'text/html; charset=utf-8' },
+          });
+        })
+    );
+    return;
+  }
 
-      return cachedResponse || fetchPromise;
+  // Static assets (CSS, JS, Fonts, Images): Cache-first with network revalidation
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        // Fetch in background to revalidate cache
+        fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const copy = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+            }
+          })
+          .catch(() => {});
+        return cachedResponse;
+      }
+
+      return fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const copy = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return new Response('', { status: 408, statusText: 'Request Timeout (Offline)' });
+        });
     })
   );
 });
