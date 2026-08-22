@@ -42,33 +42,51 @@ export const loadStarData = (): StarSystemData => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultData;
 
-    const parsed: StarSystemData = JSON.parse(raw);
+    let parsed: any = JSON.parse(raw);
     
+    // Auto-unwrap if stored as { data: StarSystemData, starsAdded: ... }
+    if (parsed && parsed.data && typeof parsed.data === 'object') {
+      parsed = parsed.data;
+    }
+
+    const totalStars = typeof parsed.totalStars === 'number' ? parsed.totalStars : 0;
+    const todayDate = typeof parsed.todayDate === 'string' ? parsed.todayDate : todayKey;
+    const wordRecords = parsed.wordRecords && typeof parsed.wordRecords === 'object' ? parsed.wordRecords : {};
+    let todayStars = typeof parsed.todayStars === 'number' ? parsed.todayStars : 0;
+    let dailyReviewsCompleted = typeof parsed.dailyReviewsCompleted === 'number' ? parsed.dailyReviewsCompleted : 0;
+
     // Check if the saved date is today
-    if (parsed.todayDate !== todayKey) {
-      // Calculate today's stars from records that were awarded today (if any)
-      let todayCount = 0;
-      let reviewsToday = 0;
-      Object.values(parsed.wordRecords || {}).forEach((rec) => {
-        if (rec.awardedDate === todayKey) {
-          todayCount += rec.baseStars + rec.bonusStars;
+    if (todayDate !== todayKey) {
+      // Recalculate today's stars from records that were awarded today (if any)
+      todayStars = 0;
+      dailyReviewsCompleted = 0;
+      Object.values(wordRecords).forEach((rec: any) => {
+        if (rec && rec.awardedDate === todayKey) {
+          todayStars += (rec.baseStars || 0) + (rec.bonusStars || 0);
         }
-        if (rec.reviewedAt?.startsWith(todayKey)) {
-          reviewsToday += 1;
+        if (rec && typeof rec.reviewedAt === 'string' && rec.reviewedAt.startsWith(todayKey)) {
+          dailyReviewsCompleted += 1;
         }
       });
 
       const updated: StarSystemData = {
-        ...parsed,
+        totalStars,
+        todayStars,
         todayDate: todayKey,
-        todayStars: todayCount,
-        dailyReviewsCompleted: reviewsToday,
+        wordRecords,
+        dailyReviewsCompleted,
       };
       saveStarData(updated);
       return updated;
     }
 
-    return parsed;
+    return {
+      totalStars,
+      todayStars,
+      todayDate,
+      wordRecords,
+      dailyReviewsCompleted,
+    };
   } catch (e) {
     console.error('Error loading star points data:', e);
     return defaultData;
@@ -77,7 +95,15 @@ export const loadStarData = (): StarSystemData => {
 
 export const saveStarData = (data: StarSystemData): void => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // Ensure clean sanitized format before writing
+    const sanitized: StarSystemData = {
+      totalStars: typeof data.totalStars === 'number' ? data.totalStars : 0,
+      todayStars: typeof data.todayStars === 'number' ? data.todayStars : 0,
+      todayDate: data.todayDate || getTodayDateKey(),
+      wordRecords: data.wordRecords && typeof data.wordRecords === 'object' ? data.wordRecords : {},
+      dailyReviewsCompleted: typeof data.dailyReviewsCompleted === 'number' ? data.dailyReviewsCompleted : 0,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
   } catch (e) {
     console.error('Error saving star points data:', e);
   }

@@ -5,6 +5,7 @@ import { getLocalDateString } from './streak';
 const OFFLINE_WORDS_CACHE_PREFIX = 'wotd_offline_words_';
 const OFFLINE_QUOTE_CACHE_PREFIX = 'wotd_offline_quote_';
 const OFFLINE_METADATA_KEY = 'wotd_offline_sync_meta';
+const OFFLINE_GENERATION_LIMIT_PREFIX = 'wotd_offline_gen_used_';
 
 export interface OfflineCacheMeta {
   lastCachedDate: string;
@@ -123,3 +124,44 @@ export function getOfflineCacheMeta(): OfflineCacheMeta | null {
     return null;
   }
 }
+
+/**
+ * Offline Generation Limits (1 generation allowed per offline period/day)
+ */
+const MAX_OFFLINE_GENERATIONS = 1;
+
+export function getOfflineGenerationsUsed(dateStr: string = getLocalDateString()): number {
+  try {
+    const raw = localStorage.getItem(`${OFFLINE_GENERATION_LIMIT_PREFIX}${dateStr}`);
+    return raw ? parseInt(raw, 10) || 0 : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function recordOfflineGenerationUsed(dateStr: string = getLocalDateString()): number {
+  try {
+    const current = getOfflineGenerationsUsed(dateStr);
+    const updated = current + 1;
+    localStorage.setItem(`${OFFLINE_GENERATION_LIMIT_PREFIX}${dateStr}`, updated.toString());
+    return updated;
+  } catch {
+    return 1;
+  }
+}
+
+export function getOfflineGenerationsRemaining(
+  isOnline: boolean,
+  dateStr: string = getLocalDateString()
+): number {
+  if (isOnline) return Infinity;
+  const used = getOfflineGenerationsUsed(dateStr);
+  return Math.max(0, MAX_OFFLINE_GENERATIONS - used);
+}
+
+export function resetOfflineGenerations(dateStr: string = getLocalDateString()): void {
+  try {
+    localStorage.removeItem(`${OFFLINE_GENERATION_LIMIT_PREFIX}${dateStr}`);
+  } catch {}
+}
+

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play, Star, Zap, Smartphone } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Quote, Volume2, Shuffle, CheckCircle2, Award, RotateCcw, Flame, Trophy, Check, Brain, Clock, BarChart3, Play, Star, Zap, Smartphone, Lock, WifiOff } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 import { QuoteItem, StreakData, AchievementBadge, LearnedWordMeta } from '../types';
 import { playPronunciation } from '../utils/speech';
@@ -40,6 +40,7 @@ interface SidebarProps {
   totalStars?: number;
   onOpenStarReviewHub?: () => void;
   isOnline?: boolean;
+  offlineGenerationsRemaining?: number;
   onOpenIosInstall?: () => void;
 }
 
@@ -73,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   totalStars = 0,
   onOpenStarReviewHub,
   isOnline = true,
+  offlineGenerationsRemaining = 1,
   onOpenIosInstall,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
@@ -377,16 +379,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span>Study Mode (Today's 10 Words)</span>
         </button>
 
-        {/* Manual Refresh / Regenerate Button */}
-        <button
-          id="sidebar-refresh-btn"
-          onClick={onRefresh}
-          disabled={isRefreshing}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-slate-300 rounded-xl bg-slate-50 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all shadow-2xs active:scale-98 disabled:opacity-60 cursor-pointer mb-3"
-        >
-          <RefreshCw className={`w-4 h-4 text-slate-600 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <span>Generate Different Set</span>
-        </button>
+        {/* Manual Refresh / Regenerate Button with Offline Limit Handling */}
+        {isOnline ? (
+          <button
+            id="sidebar-refresh-btn"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-slate-300 rounded-xl bg-slate-50 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-100 transition-all shadow-2xs active:scale-98 disabled:opacity-60 cursor-pointer mb-3"
+          >
+            <RefreshCw className={`w-4 h-4 text-slate-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>Generate Different Set</span>
+          </button>
+        ) : offlineGenerationsRemaining > 0 ? (
+          <button
+            id="sidebar-refresh-btn"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="w-full flex items-center justify-between px-3.5 py-2.5 border-2 border-amber-400 rounded-xl bg-amber-50 text-xs sm:text-sm font-extrabold text-amber-950 hover:bg-amber-100 transition-all shadow-2xs active:scale-98 disabled:opacity-60 cursor-pointer mb-3"
+            title="Chế độ Offline: Bạn có 01 lần đổi bộ từ ngoại tuyến"
+          >
+            <div className="flex items-center gap-2">
+              <RefreshCw className={`w-4 h-4 text-amber-700 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Generate Different Set</span>
+            </div>
+            <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-amber-200 text-amber-900 border border-amber-300">
+              1 lần Offline
+            </span>
+          </button>
+        ) : (
+          <div
+            id="sidebar-refresh-locked"
+            className="w-full mb-3 p-3 bg-slate-100/90 border-2 border-dashed border-slate-300 rounded-xl text-xs text-slate-600 flex items-center gap-2.5"
+          >
+            <div className="w-6 h-6 rounded-lg bg-slate-200 flex items-center justify-center shrink-0 text-slate-500">
+              <Lock className="w-3.5 h-3.5" />
+            </div>
+            <div className="leading-tight">
+              <span className="font-extrabold text-slate-700 block">Đã dùng 1/1 lần đổi bộ từ offline</span>
+              <span className="text-[11px] text-slate-500 font-semibold">Kết nối lại Internet để tiếp tục đổi bộ từ mới</span>
+            </div>
+          </div>
+        )}
 
         {/* Dedicated "Review Mode" Button (Spaced Repetition 3+ Days) */}
         <button
@@ -539,23 +572,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* iPhone 15 Pro Max Quick Install Card */}
+      {/* Mobile Packaging & Install Card */}
       {onOpenIosInstall && (
         <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl border-2 border-indigo-500/40 p-4 shadow-md flex flex-col gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center shrink-0">
-              <Smartphone className="w-4 h-4 text-white" />
+              <Smartphone className="w-4 h-4 text-emerald-300" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-black text-white">iPhone 15 Pro Max</h4>
-              <p className="text-[11px] text-indigo-300 font-semibold">Cài đặt trực tiếp • Không cần App Store</p>
+              <h4 className="text-xs sm:text-sm font-black text-white">Cài trên Android & iOS</h4>
+              <p className="text-[11px] text-indigo-300 font-semibold">Cài PWA trực tiếp • Đóng gói APK / IPA</p>
             </div>
           </div>
           <button
             onClick={onOpenIosInstall}
             className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-black text-white flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-95"
           >
-            <span>Xem cách cài đặt (3 bước)</span>
+            <span>Xem hướng dẫn cài đặt</span>
           </button>
         </div>
       )}

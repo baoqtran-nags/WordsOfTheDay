@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Star, Zap, WifiOff, CheckCircle2, Smartphone } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Layers, CheckSquare, Bookmark, Calendar, Type, Star, Zap, WifiOff, CheckCircle2, Smartphone, Lock } from 'lucide-react';
 import { INDUSTRY_CATEGORIES } from '../data/words';
 
 export type FontSizeMode = 'standard' | 'large' | 'xlarge';
@@ -21,6 +21,7 @@ interface HeaderProps {
   totalStars: number;
   onOpenStarReviewHub: () => void;
   isOnline?: boolean;
+  offlineGenerationsRemaining?: number;
   onOpenIosInstall?: () => void;
 }
 
@@ -41,6 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   totalStars,
   onOpenStarReviewHub,
   isOnline = true,
+  offlineGenerationsRemaining = 1,
   onOpenIosInstall,
 }) => {
   const todayFormatted = new Date().toLocaleDateString('en-US', {
@@ -158,17 +160,17 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Practice ({activeCount})</span>
             </button>
 
-            {/* Install on iPhone Button */}
+            {/* Install / Package App on Mobile Button */}
             {onOpenIosInstall && (
               <button
-                id="header-ios-install-btn"
+                id="header-mobile-package-btn"
                 onClick={onOpenIosInstall}
-                className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs sm:text-sm font-extrabold rounded-xl bg-slate-900 hover:bg-slate-800 text-white border-2 border-slate-900 transition-all shadow-xs cursor-pointer active:scale-95"
-                title="Hướng dẫn cài đặt trên iPhone 15 Pro Max (Add to Home Screen)"
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 text-xs sm:text-sm font-extrabold rounded-xl bg-gradient-to-r from-indigo-700 to-indigo-900 hover:from-indigo-800 hover:to-indigo-950 text-white border-2 border-indigo-900 transition-all shadow-xs cursor-pointer active:scale-95"
+                title="Cài đặt trên Android (.APK) & iOS (iPhone / iPad)"
               >
-                <Smartphone className="w-4 h-4 text-indigo-300" />
-                <span className="hidden sm:inline">Cài đặt iPhone</span>
-                <span className="sm:hidden">iOS App</span>
+                <Smartphone className="w-4 h-4 text-emerald-400" />
+                <span className="hidden sm:inline">Cài Android & iOS</span>
+                <span className="sm:hidden">Cài App</span>
               </button>
             )}
 
@@ -184,15 +186,38 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* Refresh / Generate New Set */}
-            <button
-              id="header-refresh-btn"
-              onClick={onRefresh}
-              disabled={isRefreshing}
-              className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-indigo-600 rounded-xl bg-indigo-600 text-xs sm:text-sm font-bold text-white hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-60 cursor-pointer"
-            >
-              <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>New 10 Words</span>
-            </button>
+            {isOnline ? (
+              <button
+                id="header-refresh-btn"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-2 px-4 py-2.5 border-2 border-indigo-600 rounded-xl bg-indigo-600 text-xs sm:text-sm font-bold text-white hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-60 cursor-pointer"
+              >
+                <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>New 10 Words</span>
+              </button>
+            ) : offlineGenerationsRemaining > 0 ? (
+              <button
+                id="header-refresh-btn"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-2 px-3.5 py-2.5 border-2 border-amber-400 rounded-xl bg-amber-500 text-xs sm:text-sm font-black text-slate-950 hover:bg-amber-400 transition-all shadow-md active:scale-95 disabled:opacity-60 cursor-pointer"
+                title="Chế độ Offline: Còn 01 lần đổi bộ từ"
+              >
+                <RefreshCw className={`w-4 h-4 text-slate-950 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>New 10 Words (1 left)</span>
+              </button>
+            ) : (
+              <div
+                id="header-refresh-locked"
+                className="inline-flex items-center gap-1.5 px-3 py-2 border-2 border-dashed border-slate-300 rounded-xl bg-slate-100 text-xs font-bold text-slate-500"
+                title="Đã dùng hết 01 lần đổi bộ từ khi offline. Kết nối Internet để mở lại."
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden sm:inline">Offline Limit (1/1 used)</span>
+                <span className="sm:hidden">Limit (1/1)</span>
+              </div>
+            )}
           </div>
         </div>
 

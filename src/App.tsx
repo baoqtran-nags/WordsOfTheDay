@@ -13,6 +13,8 @@ import { FloatingStudyButton } from './components/FloatingStudyButton';
 import { DoubleStarReviewModal } from './components/DoubleStarReviewModal';
 import { DailyStarReviewHubModal } from './components/DailyStarReviewHubModal';
 import { IosInstallModal } from './components/IosInstallModal';
+import { MobilePackagingModal } from './components/MobilePackagingModal';
+import { OfflineLearningHub } from './components/OfflineLearningHub';
 import { Toast, ToastMessage } from './components/Toast';
 import { FontSizeMode, Header } from './components/Header';
 import { loadStreakData, recordDailyCompletion, getLocalDateString } from './utils/streak';
@@ -36,6 +38,8 @@ import {
   getCachedDailyWords,
   cacheDailyQuote,
   getCachedDailyQuote,
+  getOfflineGenerationsRemaining,
+  recordOfflineGenerationUsed,
 } from './utils/offlineStorage';
 import {
   GraduationCap,
@@ -70,6 +74,12 @@ export default function App() {
   );
   const [isOnline, setIsOnline] = useState<boolean>(() =>
     typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  const [offlineGenerationsRemaining, setOfflineGenerationsRemaining] = useState<number>(() =>
+    getOfflineGenerationsRemaining(
+      typeof navigator !== 'undefined' ? navigator.onLine : true,
+      getLocalDateString()
+    )
   );
 
   const [selectedIndustry, setSelectedIndustry] = useState<string>('All');
@@ -204,11 +214,14 @@ export default function App() {
   useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
-      showToast('🟢 Back Online: All daily vocabulary synced.', 'success');
+      setOfflineGenerationsRemaining(Infinity);
+      showToast('🟢 Đã kết nối Internet: Tính năng đổi bộ từ và đồng bộ đã mở lại bình thường.', 'success');
     };
     const handleOffline = () => {
       setIsOnline(false);
-      showToast('⚡ Offline Mode: Today’s 10 words & study modes cached locally.', 'info');
+      const rem = getOfflineGenerationsRemaining(false, currentDateStr);
+      setOfflineGenerationsRemaining(rem);
+      showToast('⚡ Chế độ Ngoại tuyến: 10 từ hôm nay & các chế độ học đã sẵn sàng.', 'info');
     };
 
     window.addEventListener('online', handleOnline);
@@ -218,7 +231,7 @@ export default function App() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [showToast]);
+  }, [currentDateStr, showToast]);
 
   // Synchronize active 10 daily words with localStorage cache
   useEffect(() => {
@@ -349,6 +362,17 @@ export default function App() {
 
   // Function to randomize 10 words based on optional industry constraint
   const generateNewSet = useCallback((industryFilter: string = 'All') => {
+    if (!isOnline) {
+      const remaining = getOfflineGenerationsRemaining(false, currentDateStr);
+      if (remaining <= 0) {
+        showToast('⚠️ Bạn đã sử dụng hết 01 lần đổi bộ từ khi ngoại tuyến. Kết nối lại Internet để mở lại tính năng này.', 'error');
+        return;
+      }
+      // Record offline generation usage
+      recordOfflineGenerationUsed(currentDateStr);
+      setOfflineGenerationsRemaining(0);
+    }
+
     setIsRefreshing(true);
 
     setTimeout(() => {
@@ -373,9 +397,13 @@ export default function App() {
       setCurrentQuote(randomQuote);
 
       setIsRefreshing(false);
-      showToast('Generated 10 new illustrated vocabulary cards for today', 'success');
+      if (!isOnline) {
+        showToast('⚡ Đã đổi bộ từ ngoại tuyến thành công (Đã dùng 1/1 lần offline)!', 'success');
+      } else {
+        showToast('Generated 10 new illustrated vocabulary cards for today', 'success');
+      }
     }, 250);
-  }, [showToast]);
+  }, [isOnline, currentDateStr, showToast]);
 
   const handleSelectIndustry = (industry: string) => {
     setSelectedIndustry(industry);
@@ -429,7 +457,7 @@ export default function App() {
         
         // Award base +10 stars
         const updatedStarData = awardBaseWordStars(id);
-        setStarData(updatedStarData);
+        setStarData(updatedStarData.data);
 
         // Prompt voluntary Double Star review challenge (12:00 AM - 11:59 PM)
         if (item) {
@@ -445,7 +473,7 @@ export default function App() {
 
   const handleCompleteDoubleStar = (wordId: string) => {
     const updated = awardDoubleBonusStars(wordId);
-    setStarData(updated);
+    setStarData(updated.data);
     triggerStreakCelebrationConfetti();
     showToast('🎉 2X MULTIPLIER UNLOCKED! +20 Stars Added to Today’s Total! ⭐⭐', 'success');
   };
@@ -638,6 +666,7 @@ export default function App() {
                 totalStars={starData.totalStars}
                 onOpenStarReviewHub={() => setIsDailyStarHubOpen(true)}
                 isOnline={isOnline}
+                offlineGenerationsRemaining={offlineGenerationsRemaining}
                 onOpenIosInstall={() => setIsIosInstallOpen(true)}
               />
             </div>
@@ -646,27 +675,18 @@ export default function App() {
           {/* Right Column: Scrollable Feed of 10 Word Cards */}
           <main className={`w-full min-w-0 space-y-4 sm:space-y-6 ${isFocusMode ? 'max-w-3xl mx-auto' : 'flex-1'}`}>
             
-            {/* Offline Notification Banner */}
-            {!isOnline && (
-              <div className="bg-amber-50 border-2 border-amber-300 text-amber-950 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-200 flex items-center justify-center text-amber-900 shrink-0">
-                    <WifiOff className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-extrabold text-amber-950">
-                      Offline Mode Active
-                    </h3>
-                    <p className="text-xs text-amber-800 font-medium">
-                      All 10 daily words, pronunciations, flashcard study modes, and quizzes are stored locally in your browser cache and remain 100% functional offline.
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[11px] font-black px-2.5 py-1 rounded-full bg-amber-200 text-amber-950 border border-amber-300 shrink-0 hidden sm:inline-block">
-                  Cached & Ready
-                </span>
-              </div>
-            )}
+            {/* Dedicated Offline Learning Hub & Controls */}
+            <OfflineLearningHub
+              isOnline={isOnline}
+              totalWords={currentWords.length}
+              learnedCount={learnedCountInCurrentSet}
+              offlineGenerationsRemaining={offlineGenerationsRemaining}
+              onRefresh={() => generateNewSet(selectedIndustry)}
+              isRefreshing={isRefreshing}
+              onOpenStudyMode={() => setIsStudyModeOpen(true)}
+              onOpenPractice={() => setIsPracticeOpen(true)}
+              dateStr={currentDateStr}
+            />
 
             {/* PRIMARY "START STUDYING" HERO BANNER (Distraction-Free 2-Page Mobile/Desktop Flashcard Experience) */}
             <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-4 sm:p-5 border-2 border-indigo-700 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -896,9 +916,10 @@ export default function App() {
       <DoubleStarReviewModal
         isOpen={activeDoubleReviewWord !== null}
         onClose={() => setActiveDoubleReviewWord(null)}
-        word={activeDoubleReviewWord}
+        targetWord={activeDoubleReviewWord}
         onCompleteDouble={handleCompleteDoubleStar}
-        onShowToast={showToast}
+        todayStars={starData.todayStars}
+        totalStars={starData.totalStars}
       />
 
       {/* Daily Star Points & Voluntary Batch Review Hub Modal */}
@@ -906,11 +927,9 @@ export default function App() {
         isOpen={isDailyStarHubOpen}
         onClose={() => setIsDailyStarHubOpen(false)}
         starData={starData}
-        todayWords={currentWords}
-        learnedWordIds={learnedWordIds}
+        learnedWords={VOCABULARY_DATABASE.filter((w) => learnedWordIds.includes(w.id))}
         onOpenSingleWordReview={(word) => setActiveDoubleReviewWord(word)}
         onCompleteDouble={handleCompleteDoubleStar}
-        onShowToast={showToast}
       />
 
       {/* Interactive Practice Quiz & Flashcard Modal */}
@@ -939,8 +958,8 @@ export default function App() {
         onToggleSave={handleToggleSave}
       />
 
-      {/* iPhone 15 Pro Max Direct Install Guide Modal */}
-      <IosInstallModal
+      {/* Mobile Packaging & Install Modal (Android APK + iOS PWA/IPA) */}
+      <MobilePackagingModal
         isOpen={isIosInstallOpen}
         onClose={() => setIsIosInstallOpen(false)}
       />

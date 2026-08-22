@@ -36,12 +36,12 @@ export const DailyStarReviewHubModal: React.FC<DailyStarReviewHubModalProps> = (
 
   // Words that are learned but not yet doubled
   const eligibleWords = learnedWords.filter((w) => {
-    const rec = starData.wordRecords[w.id];
+    const rec = starData?.wordRecords?.[w.id];
     return rec && !rec.isDoubled;
   });
 
   const doubledWords = learnedWords.filter((w) => {
-    const rec = starData.wordRecords[w.id];
+    const rec = starData?.wordRecords?.[w.id];
     return rec && rec.isDoubled;
   });
 
